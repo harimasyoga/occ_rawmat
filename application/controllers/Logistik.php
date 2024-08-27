@@ -14,6 +14,24 @@ class Logistik extends CI_Controller
 		$this->load->model('m_logistik');
 	}
 
+	public function Timbangan()
+	{
+		$data = array(
+			'judul' => "Timbangan",
+		);
+
+		$this->load->view('header',$data);
+		if($this->session->userdata('level'))
+		{
+			$this->load->view('Logistik/v_timbangan');
+		}else{
+			$this->load->view('home');
+		}
+		$this->load->view('footer');
+	}
+
+	
+
 	public function Invoice()
 	{
 		$data = array(
@@ -202,6 +220,58 @@ class Logistik extends CI_Controller
 
 				$i++;
 			}
+		}else if ($jenis == "Timbangan") {
+			$query = $this->db->query("SELECT * FROM m_jembatan_timbang ORDER BY id_timbangan DESC")->result();
+			$i = 1;
+			foreach ($query as $r) {
+				
+				$id         = "'$r->id_timbangan'";
+				$no_timb    = "'$r->no_timbangan'";
+				
+				$print      = base_url('Logistik/printTimbangan?id='.$r->id_timbangan.'&top=10');
+				$printLampiran = base_url('Logistik/lampiranTimbangan?id='.$r->id_timbangan);
+				$row        = array();
+				$row[]      = '<div class="text-center">'.$i.'</div>';
+				$row[]      = '<div class="text-center">'.$r->no_timbangan.'</div>';
+				$row[]      = '<div class="text-center">'.$r->permintaan.'</div>';
+				$row[]      = '<div class="text-center">'.substr($r->date_masuk,0,10).'</div>';
+				$row[]      = $r->suplier;
+				$row[]      = $r->nm_barang;
+				$row[]      = $r->catatan;
+				$row[]      = '<div class="text-right"><a>'.number_format($r->berat_bersih, 0, ",", ".").'</a></div>';
+				// $row[] = '<div class="text-right"><a href="javascript:void(0)" onclick="editTimbangan('."'".$r->id_timbangan."'".','."'detail'".')">'.number_format($r->berat_bersih).'</a></div>';
+				$aksi       = "";
+
+				if (in_array($this->session->userdata('level'), ['Admin','Pembayaran'])) 
+				{
+					// $cek = $this->db->query("SELECT * FROM trs_h_stok_bb where no_timbangan='$r->no_timbangan' ")->num_rows();
+
+					// if($cek>0)
+					// {
+					// 	$aksi = '
+					// 	<a target="_blank" class="btn btn-sm btn-primary" href="'.$print.'" title="CETAK" ><b><i class="fa fa-print"></i> </b></a>
+					// 	<a target="_blank" class="btn btn-sm btn-secondary" href="'.$printLampiran.'" title="LAMPIRAN"><i class="fas fa-paperclip" style="color:#fff"></i></a>';
+					// }else{
+
+						$aksi = '
+						<a class="btn btn-sm btn-warning" href="' . base_url("Logistik/v_timbangan_edit?id_timb=" .$r->id_timbangan ."&no_timb=" .$r->no_timbangan ."") . '" title="EDIT DATA" >
+							<b><i class="fa fa-edit"></i> </b>
+						</a> 
+						<button type="button" title="DELETE" onclick="deleteTimbangan(' . $id . ',' . $no_timb . ')" class="btn btn-danger btn-sm">
+							<i class="fa fa-trash-alt"></i>
+
+						</button> 
+						<a target="_blank" class="btn btn-sm btn-primary" href="'.$print.'" title="CETAK" ><b><i class="fa fa-print"></i> </b></a>
+						<a target="_blank" class="btn btn-sm btn-secondary" href="'.$printLampiran.'" title="LAMPIRAN"><i class="fas fa-paperclip" style="color:#fff"></i></a>';
+					// }
+					
+				} else {
+					$aksi = '<a target="_blank" class="btn btn-sm btn-primary" href="'.$print.'" title="CETAK" ><b><i class="fa fa-print"></i> </b></a>';
+				}
+				$row[] = '<div class="text-center">'.$aksi.'</div>';
+				$data[] = $row;
+				$i++;
+			}
 		}else{
 
 		}
@@ -212,6 +282,33 @@ class Logistik extends CI_Controller
 		//output to json format
 		echo json_encode($output);
 	}
+
+	function deleteTimbangan()
+	{
+		$result = $this->m_logistik->deleteTimbangan();
+		echo json_encode($result);
+	}
+	
+	function load_hub()
+    {
+        $query = $this->db->query("SELECT*FROM m_hub order by id_hub")->result();
+
+            if (!$query) {
+                $response = [
+                    'message'	=> 'not found',
+                    'data'		=> [],
+                    'status'	=> false,
+                ];
+            }else{
+                $response = [
+                    'message'	=> 'Success',
+                    'data'		=> $query,
+                    'status'	=> true,
+                ];
+            }
+            $json = json_encode($response);
+            print_r($json);
+    }
 
 	function load_sj($searchTerm="")
 	{
@@ -995,6 +1092,12 @@ class Logistik extends CI_Controller
 	function simpanGudang()
 	{
 		$result = $this->m_logistik->simpanGudang();
+		echo json_encode($result);
+	}
+
+	function simpanTimbangan()
+	{
+		$result = $this->m_logistik->simpanTimbangan();
 		echo json_encode($result);
 	}
 

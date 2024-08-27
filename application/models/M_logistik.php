@@ -12,6 +12,76 @@ class M_logistik extends CI_Model
 		$this->load->model('m_master');
 	}
 
+	function simpanTimbangan()
+	{
+		$thn            = date('Y');
+		$no_timbangan   = $this->m_fungsi->urut_transaksi('TIMBANGAN').'/TIMB'.'/'.$thn;
+		$status_input   = $this->input->post('sts_input');
+
+		if($status_input == 'add')
+		{
+			$data_header = array(
+				'no_timbangan'   => $no_timbangan,
+				'jns'     		 => $this->input->post('jns'),
+				'id_hub_occ'     => $this->input->post('hub_occ'),
+				'nm_penimbang'   => $this->input->post('penimbang'),
+				'permintaan'     => $this->input->post('permintaan'),
+				'suplier'        => $this->input->post('supplier'),
+				'date_masuk'     => $this->input->post('masuk'),
+				'alamat'         => $this->input->post('alamat'),
+				'date_keluar'    => $this->input->post('keluar'),
+				'no_polisi'      => $this->input->post('nopol'),
+				'berat_kotor'    => str_replace('.','',$this->input->post('b_kotor')),
+				'nm_barang'      => $this->input->post('barang'),
+				'berat_truk'     => str_replace('.','',$this->input->post('berat_truk')),
+				'nm_sopir'       => $this->input->post('sopir'),
+				'berat_bersih'   => str_replace('.','',$this->input->post('berat_bersih')),
+				'catatan'        => $this->input->post('cttn'),
+				'potongan'       => str_replace('.','',$this->input->post('pot')),
+			);
+		
+			$result_header = $this->db->insert('m_jembatan_timbang', $data_header);	
+				
+		}else{
+
+			$data_header = array(
+				'input_t'     	 => $this->input->post('plh_input'),
+				'no_timbangan'   => $this->input->post('no_timbangan'),
+				'id_hub_occ'     => $this->input->post('hub_occ'),
+				'jns'     		 => $this->input->post('jns'),
+				'nm_penimbang'   => $this->input->post('penimbang'),
+				'permintaan'     => $this->input->post('permintaan'),
+				'suplier'        => $this->input->post('supplier'),
+				'date_masuk'     => $this->input->post('masuk'),
+				'alamat'         => $this->input->post('alamat'),
+				'date_keluar'    => $this->input->post('keluar'),
+				'no_polisi'      => $this->input->post('nopol'),
+				'berat_kotor'    => str_replace('.','',$this->input->post('b_kotor')),
+				'nm_barang'      => $this->input->post('barang'),
+				'berat_truk'     => str_replace('.','',$this->input->post('berat_truk')),
+				'nm_sopir'       => $this->input->post('sopir'),
+				'berat_bersih'   => str_replace('.','',$this->input->post('berat_bersih')),
+				'catatan'        => $this->input->post('cttn'),
+				'potongan'       => str_replace('.','',$this->input->post('pot')),
+			);
+		
+			
+			$this->db->where('id_timbangan', $this->input->post('id_timbangan'));
+			$result_header = $this->db->update('m_jembatan_timbang', $data_header);		
+			
+		}
+		return $result_header;
+	}
+
+	function deleteTimbangan()
+	{
+		$this->db->where('id_timbangan', $_POST["id_timbangan"]);
+		$data = $this->db->delete('m_jembatan_timbang');
+		return [
+			'data' => $data,
+		];
+	}
+
 	function save_invoice()
 	{
 		$cek_inv        = $this->input->post('cek_inv');
@@ -160,98 +230,6 @@ class M_logistik extends CI_Model
 
 		}
 			
-	}
-
-	function loadGudang()
-	{
-		$opsi = $_POST["opsi"];
-		if($opsi == 'cor'){
-			$where = "AND g.gd_id_plan_cor!='0' AND g.gd_id_plan_flexo IS NULL AND g.gd_id_plan_finishing IS NULL";
-		}else if($opsi == 'flexo'){
-			$where = "AND g.gd_id_plan_cor!='0' AND g.gd_id_plan_flexo!='0' AND g.gd_id_plan_finishing IS NULL";
-		}else if($opsi == 'finishing'){
-			$where = "AND g.gd_id_plan_cor!='0' AND g.gd_id_plan_flexo!='0' AND g.gd_id_plan_finishing!='0'";
-		}else{
-			$where = "";
-		}
-
-		$data = $this->db->query("SELECT COUNT(g.id_gudang) AS jml,p.nm_pelanggan,i.nm_produk,g.* FROM m_gudang g
-		INNER JOIN m_produk i ON g.gd_id_produk=i.id_produk
-		INNER JOIN m_pelanggan p ON g.gd_id_pelanggan=p.id_pelanggan
-		WHERE g.gd_cek_spv='Open' $where
-		GROUP BY p.nm_pelanggan,g.gd_id_produk");
-
-		return [
-			'data' => $data->result(),
-			'opsi' => $opsi,
-			'id_pelanggan' => $_POST["id_pelanggan"],
-			'id_produk' => $_POST["id_produk"],
-		];
-	}
-
-	function loadListProduksiPlan()
-	{
-		$opsi = $_POST["opsi"];
-		$id_pelanggan = $_POST["id_pelanggan"];
-		$id_produk = $_POST["id_produk"];
-
-		if($opsi == 'cor'){
-			$data = $this->db->query("SELECT w.kode_po,COUNT(g.id_gudang) AS jml_gd,g.* FROM m_gudang g
-			INNER JOIN plan_cor c ON g.gd_id_plan_cor=c.id_plan
-			INNER JOIN trs_wo w ON g.gd_id_trs_wo=w.id
-			WHERE g.gd_id_pelanggan='$id_pelanggan' AND g.gd_id_produk='$id_produk'
-			AND g.gd_id_plan_cor IS NOT NULL AND g.gd_id_plan_flexo IS NULL AND g.gd_id_plan_finishing IS NULL AND g.gd_cek_spv='Open' 
-			GROUP BY g.gd_id_pelanggan,g.gd_id_produk,w.kode_po");
-		}else if($opsi == 'flexo'){
-			$data = $this->db->query("SELECT w.kode_po,COUNT(g.id_gudang) AS jml_gd,g.* FROM m_gudang g
-			INNER JOIN plan_flexo fx ON g.gd_id_plan_cor=fx.id_plan_cor AND g.gd_id_plan_flexo=fx.id_flexo
-			INNER JOIN trs_wo w ON g.gd_id_trs_wo=w.id
-			WHERE g.gd_id_pelanggan='$id_pelanggan' AND g.gd_id_produk='$id_produk'
-			AND g.gd_id_plan_cor IS NOT NULL AND g.gd_id_plan_flexo IS NOT NULL AND g.gd_id_plan_finishing IS NULL AND g.gd_cek_spv='Open' 
-			GROUP BY g.gd_id_pelanggan,g.gd_id_produk,w.kode_po");
-		}else{
-			$data = $this->db->query("SELECT w.kode_po,COUNT(g.id_gudang) AS jml_gd,g.* FROM m_gudang g
-			INNER JOIN plan_finishing fs ON g.gd_id_plan_cor=fs.id_plan_cor AND g.gd_id_plan_flexo=fs.id_plan_flexo AND g.gd_id_plan_finishing=fs.id_fs
-			INNER JOIN trs_wo w ON g.gd_id_trs_wo=w.id
-			WHERE g.gd_id_pelanggan='$id_pelanggan' AND g.gd_id_produk='$id_produk'
-			AND g.gd_id_plan_cor IS NOT NULL AND g.gd_id_plan_flexo IS NOT NULL AND g.gd_id_plan_finishing IS NOT NULL AND g.gd_cek_spv='Open' 
-			GROUP BY g.gd_id_pelanggan,g.gd_id_produk,w.kode_po");
-		}
-
-		return $data;
-	}
-
-	function clickHasilProduksiPlan()
-	{
-		$opsi = $_POST["opsi"];
-		$id_pelanggan = $_POST["id_pelanggan"];
-		$id_produk = $_POST["id_produk"];
-		$no_po = $_POST["no_po"];
-
-		if($opsi == 'cor'){
-			$data = $this->db->query("SELECT g.*,c.* FROM m_gudang g
-			INNER JOIN plan_cor c ON g.gd_id_plan_cor=c.id_plan
-			INNER JOIN trs_wo w ON g.gd_id_trs_wo=w.id
-			WHERE g.gd_id_pelanggan='$id_pelanggan' AND g.gd_id_produk='$id_produk' AND w.kode_po='$no_po'
-			AND g.gd_id_plan_cor IS NOT NULL AND g.gd_id_plan_flexo IS NULL AND g.gd_id_plan_finishing IS NULL
-			ORDER BY c.tgl_plan");
-		}else if($opsi == 'flexo'){
-			$data = $this->db->query("SELECT g.*,fx.* FROM m_gudang g
-			INNER JOIN plan_flexo fx ON g.gd_id_plan_cor=fx.id_plan_cor AND g.gd_id_plan_flexo=fx.id_flexo
-			INNER JOIN trs_wo w ON g.gd_id_trs_wo=w.id
-			WHERE g.gd_id_pelanggan='$id_pelanggan' AND g.gd_id_produk='$id_produk' AND w.kode_po='$no_po'
-			AND g.gd_id_plan_cor IS NOT NULL AND g.gd_id_plan_flexo IS NOT NULL AND g.gd_id_plan_finishing IS NULL
-			ORDER BY fx.tgl_flexo");
-		}else{
-			$data = $this->db->query("SELECT g.*,fs.* FROM m_gudang g
-			INNER JOIN plan_finishing fs ON g.gd_id_plan_cor=fs.id_plan_cor AND g.gd_id_plan_flexo=fs.id_plan_flexo AND g.gd_id_plan_finishing=fs.id_fs
-			INNER JOIN trs_wo w ON g.gd_id_trs_wo=w.id
-			WHERE g.gd_id_pelanggan='$id_pelanggan' AND g.gd_id_produk='$id_produk' AND w.kode_po='$no_po'
-			AND g.gd_id_plan_cor IS NOT NULL AND g.gd_id_plan_flexo IS NOT NULL AND g.gd_id_plan_finishing IS NOT NULL
-			ORDER BY fs.tgl_fs");
-		}
-
-		return $data;
 	}
 
 	function simpanGudang()

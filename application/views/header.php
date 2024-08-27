@@ -132,7 +132,7 @@ $setting = $this->db->query("SELECT * FROM m_setting")->row();
 					with font-awesome or any other icon font library -->
 								<li class="nav-item has-treeview">
 								<a href="<?= base_url('Master') ?>" class="nav-link">
-									<h2><i class="fa fa-box-open"></i>
+									<h2><i class="fas fa-recycle"></i>
 										<?= $setting->singkatan ?></h2>
 								</a>
 								</li>
@@ -210,11 +210,11 @@ $setting = $this->db->query("SELECT * FROM m_setting")->row();
 				<!-- /.sidebar-menu -->
 			</div>
 			<!-- /menu footer buttons -->
-			<div class="sidebar-footer">			
+			<!-- <div class="sidebar-footer">			
               <a data-toggle="tooltip" data-placement="top" title="Logout">
                 <img width="50"  src="<?= base_url('assets/gambar/ppi.png')?>" alt=""></span>
               </a>
-            </div>
+            </div> -->
 			<!-- <div style="position:absolute;bottom:0;right:0;left:0;padding:5px 5px 5px 10px; background-image: linear-gradient(180deg,#cc193800 10%,#450410ad 100%);">
 				
 				<img width="50"  src="<?= base_url('assets/gambar/ppi.png')?>" alt="">

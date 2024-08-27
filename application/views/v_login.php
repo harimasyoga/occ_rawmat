@@ -29,7 +29,8 @@
 
   <div class="login-logo">
     <!-- <img src="<?= base_url('assets/gambar/').$setting->logo ?>" width="50%"> -->
-    <i style="color:white" class="fas fa-cogs"></i>
+    <!-- <i style="color:white" class="fas fa-cogs"></i> -->
+    <i style="color:white" class="fas fa-recycle"></i>
     <br>
     <a href="#"><b><?= $setting->singkatan ?></b></a>
   </div>
