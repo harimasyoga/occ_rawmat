@@ -42,12 +42,12 @@
 								<tr>
 									<th class="text-center">NO</th>
 									<th class="text-center">NO INVOICE</th>
-									<th class="text-center">NO STOK</th>
+									<th class="text-center">NO TIMBANGAN</th>
 									<th class="text-center">TANGGAL</th>
-									<th class="text-center">CUST</th>
-									<th class="text-center">QTY <br> ( Kg )</th>
-									<th class="text-center">HARGA<br> ( Rp )</th>
-									<th class="text-center">TOTAL <br> ( Rp )</th>
+									<th class="text-center">HUB</th>
+									<th class="text-center">QTY (Kg)</th>
+									<th class="text-center">HARGA (Rp)</th>
+									<th class="text-center">TOTAL (Rp)</th>
 									<th class="text-center">ACC OWNER</th>
 									<th class="text-center">AKSI</th>
 								</tr>
@@ -86,17 +86,13 @@
 							<input type="text" class="angka form-control" name="no_inv_bhn" id="no_inv_bhn" value="AUTO" readonly>
 						</div>
 						<div class="col-md-1"></div>
-						<div class="col-md-2">NO STOK</div>
+						<div class="col-md-2">NO TIMBANGAN</div>
 						<div class="col-md-3">
-
 							<div class="input-group">								
-								<input type="hidden" name="id_stok_d" id="id_stok_d">
-
-								<input type="text" name="no_stok" id="no_stok" class="form-control angka" readonly>
-
+								<input type="text" class="form-control" id="no_timbangan" name="no_timbangan" value="AUTO" readonly>
 								<div class="input-group-append">
 									<span class="input-group-text">
-										<a onclick="search_stok(0)">
+										<a onclick="search_timb(0)">
 											<i class="fas fa-search" style="color:red"></i> 
 										</a>
 									</span>
@@ -126,12 +122,7 @@
 					</div>
 					
 					<div class="card-body row" style="padding-bottom:1px;font-weight:bold">								
-						<div class="col-md-2">Cust</div>
-						<div class="col-md-3">
-							<select class="form-control select2" name="id_hub" id="id_hub" style="width: 100%;" readonly>
-							</select>
-						</div>
-						<div class="col-md-1"></div>
+						
 						<div class="col-md-2">Harga</div>
 						<div class="col-md-3">
 							<div class="input-group mb-1">
@@ -143,15 +134,6 @@
 									
 							</div>
 						</div>		
-						
-					</div>
-					
-					<div class="card-body row" style="padding-bottom:1px;font-weight:bold">			
-								
-						<div class="col-md-2">Keterangan</div>
-						<div class="col-md-3">
-							<textarea type="text" class="form-control" name="ket" id="ket" ></textarea>
-						</div>
 						<div class="col-md-1"></div>
 						<div class="col-md-2">Total Bayar</div>
 						<div class="col-md-3">
@@ -165,6 +147,153 @@
 							</div>
 						</div>
 					</div>
+					
+					<hr>
+
+					<div class="card-body row" style="padding-bottom:1px;font-weight:bold">								
+				
+						<div class="col-md-2">List Timbangan</div>
+						<div class="col-md-9"></div>	
+					</div>
+					<br>
+
+					<div class="card-body row" style="padding-bottom:1px;font-weight:bold">			
+						<div class="col-md-2">HUB</div>
+						<div class="col-md-3">
+							<input type="text" class="form-control" id="hub_occ" name="hub_occ" value="AUTO" readonly>
+							</select>
+
+						</div>
+						<div class="col-md-1"></div>
+			
+						<div class="col-md-2">PERMINTAAN</div>
+						<div class="col-md-3">
+							<input type="text" name="permintaan" id="permintaan" class="form-control" value="PPI" oninput="this.value = this.value.toUpperCase() " readonly>
+						</div>
+					</div>
+					<div class="card-body row" style="padding-bottom:1px;font-weight:bold">			
+						
+						<div class="col-md-2">JENIS</div>
+						<div class="col-md-3">	
+							<input type="text" class="form-control" id="jns" name="jns" value="AUTO" readonly>
+
+						</div>
+						<div class="col-md-1"></div>
+			
+						<div class="col-md-2">PENIMBANG</div>
+						<div class="col-md-3">
+							<input type="text" class="form-control" id="penimbang" name="penimbang" value="AUTO" readonly>
+						</div>
+					</div>
+					<div class="card-body row" style="padding-bottom:1px;font-weight:bold">			
+						
+						<div class="col-md-2">MASUK</div>
+						<div class="col-md-3">
+							<input type="datetime-local" name="masuk" id="masuk" class="form-control" readonly>
+
+						</div>
+						<div class="col-md-1"></div>
+			
+						<div class="col-md-2">CATATAN</div>
+						<div class="col-md-3">
+							<input type="text" class="form-control" id="cttn" name="cttn" value="AUTO" readonly>
+
+						</div>
+					</div>
+					<div class="card-body row" style="padding-bottom:1px;font-weight:bold">			
+						
+						<div class="col-md-2">KELUAR</div>
+						<div class="col-md-3">
+							<input type="datetime-local" name="keluar" id="keluar" class="form-control" readonly>
+
+						</div>
+						<div class="col-md-1"></div>
+			
+						<div class="col-md-2">SUPPLIER</div>
+						<div class="col-md-3">							
+							<input type="text" class="form-control" id="supplier" name="supplier" value="AUTO" readonly>
+
+						</div>
+					</div>
+					<div class="card-body row" style="padding-bottom:1px;font-weight:bold">			
+						
+						<div class="col-md-2">BERAT KOTOR</div>
+						<div class="col-md-3">
+							<div class="input-group mb-3">
+															
+								<input type="text" class="form-control" id="b_kotor" name="b_kotor" value="AUTO" readonly>
+								<div class="input-group-append">
+									<span class="input-group-text"><b>Kg</b></span>
+								</div>
+							</div>
+
+						</div>
+						<div class="col-md-1"></div>
+			
+						<div class="col-md-2">ALAMAT</div>
+						<div class="col-md-3">
+							<input type="text" class="form-control" id="alamat" name="alamat" value="AUTO" readonly>
+						</div>
+					</div>
+					<div class="card-body row" style="padding-bottom:1px;font-weight:bold">			
+						
+						<div class="col-md-2">BERAT TRUK</div>
+						<div class="col-md-3">
+							<div class="input-group mb-3">
+								<input type="text" class="form-control" id="berat_truk" name="berat_truk" value="AUTO" readonly>
+								<div class="input-group-append">
+									<span class="input-group-text"><b>Kg</b></span>
+								</div>
+							</div>			
+
+						</div>
+						<div class="col-md-1"></div>
+			
+						<div class="col-md-2">NO POLISI</div>
+						<div class="col-md-3">
+							<input type="text" class="form-control" id="nopol" name="nopol" value="AUTO" readonly>
+						</div>
+					</div>
+					<div class="card-body row" style="padding-bottom:1px;font-weight:bold">			
+						
+						<div class="col-md-2">BERAT BERSIH</div>
+						<div class="col-md-3">
+							<div class="input-group mb-3">
+							<input type="text" class="form-control" id="berat_bersih" name="berat_bersih" value="AUTO" readonly>
+								<div class="input-group-append">
+									<span class="input-group-text"><b>Kg</b></span>
+								</div>
+							</div>
+
+						</div>
+						<div class="col-md-1"></div>
+			
+						<div class="col-md-2">BARANG</div>
+						<div class="col-md-3">
+							<input type="text" class="form-control" id="barang" name="barang" value="AUTO" readonly>
+						</div>
+					</div>
+					
+					<div class="card-body row" style="padding-bottom:1px;font-weight:bold">			
+						
+						<div class="col-md-2">POTONGAN</div>
+						<div class="col-md-3">
+							<div class="input-group mb-3">
+								<input type="text" class="form-control" id="pot" name="pot" value="AUTO" readonly>
+								<div class="input-group-append">
+									<span class="input-group-text"><b>Kg</b></span>
+								</div>
+							</div>
+
+						</div>
+						<div class="col-md-1"></div>
+			
+						<div class="col-md-2">SOPIR</div>
+						<div class="col-md-3">
+							<input type="text" class="form-control" id="sopir" name="sopir" value="AUTO" readonly>
+						</div>
+					</div>
+
 					
 					<br>
 
@@ -192,7 +321,7 @@
 </div>
 
 <!-- Modal search stok -->
-<div class="modal fade list_stok" role="dialog" aria-hidden="true">
+<div class="modal fade list_timb" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-full" style="width:100%;margin:auto">
 
         <div class="modal-content">
@@ -202,18 +331,19 @@
             <div class="modal-body">
 				<div style="overflow:auto;white-space:nowrap">
 
-                <table class="table table-bordered table-striped" id="tbl_stok" style="margin:auto !important">
+                <table class="table table-bordered table-striped" id="tbl_timb" style="margin:auto !important">
                     <thead class="color-tabel">
 						<tr>
-							<th class="text-center">NO</th>
-							<th class="text-center">NO STOK</th>
-							<th class="text-center">TANGGAL</th>
-							<th class="text-center">STATUS</th>
-							<th class="text-center">NO TIMB</th>
-							<th class="text-center">TIMBANGAN</th>
-							<th class="text-center">TONASE</th>
-							<th class="text-center" style="padding : 12px 50px">CUST</th>
-							<th class="text-center">AKSI</th>
+							<th style="text-align: center; width:5%">NO.</th>
+							<th style="text-align: center; width:10%">NO TIMBANGAN</th>
+							<th style="text-align: center; width:15%">TGL MASUK</th>
+							<th style="text-align: center; width:20%">NOPOL</th>
+							<th style="text-align: center; width:20%">SOPIR</th>
+							<th style="text-align: center; width:20%">CUST</th>
+							<th style="text-align: center; width:10%">JENIS</th>
+							<th style="text-align: center; width:20%">CATATAN</th>
+							<th style="text-align: center; width:10%">BERAT BERSIH</th>
+							<th style="text-align: center; width:10%">AKSI</th>
 						</tr>
                     </thead>
                     <tbody>
@@ -388,18 +518,18 @@
 		
 	}
 	
-	function search_stok()
+	function search_timb()
 	{
-		$('.list_stok').modal('show');
+		$('.list_timb').modal('show');
 		
-		var table   = $('#tbl_stok').DataTable();
+		var table   = $('#tbl_timb').DataTable();
 		table.destroy();
-		tabel = $('#tbl_stok').DataTable({
+		tabel = $('#tbl_timb').DataTable({
 			"processing"   : true,
 			"pageLength"   : true,
 			"paging"       : true,
 			"ajax": {
-				"url"   : '<?php echo base_url('Logistik/load_data/stok_bb_rinci')?>',
+				"url"   : '<?php echo base_url('Logistik/load_data/search_timbangan')?>',
 				"type"  : "POST",
 			},
 			"aLengthMenu": [
@@ -414,13 +544,13 @@
 		})
 	}
 
-	function spilldata(id,no_stok)
+	function spilldata(id,no_timbangan)
 	{		
 		$.ajax({
 			url        : '<?= base_url(); ?>Logistik/load_data_1',
 			type       : "POST",
-			dataType   : "JSON",
-			data       : { id, no:no_stok, jenis:'spill_stok' },
+			dataType   : "JSON", 
+			data       : { id : no_timbangan, jenis:'spill_timb',field :'no_timbangan' },
 			beforeSend: function() {
 				swal({
 				title: 'loading data...',
@@ -434,21 +564,28 @@
 			success: function(data) {
 				// console.log(data)
 				if(data){		 	
-					var harga_bhn = 2300
-					$("#id_stok_d").val(data.header.id_stok_d);
-					$("#no_stok").val(data.header.no_stok);
-					$("#tgl_inv").val(data.header.tgl_stok);
-					$("#id_hub").val(data.header.id_hub).trigger('change');
-					$("#ket").val('-');
-					$("#qty").val(format_angka(data.header.datang_bhn_bk));
-					$("#nom").val(format_angka(harga_bhn));
-					var total = data.header.datang_bhn_bk*harga_bhn
-					$("#total_bayar").val(format_angka(total));		
-					
-					$("#id_hub").prop("readonly", true);
-
+					// header
+					$("#no_timbangan").val(data.header.no_timbangan);
+					$("#hub_occ").val(data.header.nm_hub);
+					$("#jns").val(data.header.jns);
+					$("#penimbang").val(data.header.nm_penimbang);
+					$("#permintaan").val(data.header.permintaan);					
+					$("#supplier").val(data.header.suplier);					
+					$("#masuk").val(data.header.date_masuk);					
+					$("#alamat").val(data.header.alamat);					
+					$("#keluar").val(data.header.date_keluar);					
+					$("#nopol").val(data.header.no_polisi);					
+					$("#b_kotor").val(format_angka(data.header.berat_kotor));					
+					$("#barang").val(data.header.nm_barang);					
+					$("#berat_truk").val(format_angka(data.header.berat_truk));					
+					$("#sopir").val(data.header.nm_sopir);					
+					$("#berat_bersih").val(format_angka(data.header.berat_bersih));					
+					$("#qty").val(format_angka(data.header.berat_bersih));					
+					$("#cttn").val(data.header.catatan);					
+					$("#pot").val(format_angka(data.header.potongan));	
+					hitung_total();
 					swal.close();
-					$('.list_stok').modal('hide');
+					$('.list_timb').modal('hide');
 
 				} else {
 
@@ -764,15 +901,27 @@
 	{
 		var tgl = '<?= date('Y-m-d') ?>'	
 		$("#id_inv_bhn").val('');
-		$("#no_inv_bhn").val('AUTO');
-		$("#id_stok_d").val('');
-		$("#no_stok").val('');
-		$("#tgl_inv").val(tgl);
-		$("#id_hub").val('').trigger('change');
-		$("#ket").val('-');
-		$("#qty").val(0);
-		$("#nom").val(0);
-		$("#total_bayar").val(format_angka(0));	
+		$("#no_inv_bhn").val('AUTO');			
+		$("#nom").val(format_angka(0));
+
+		$("#no_timbangan").val('AUTO');
+		$("#hub_occ").val('AUTO');
+		$("#jns").val('AUTO');
+		$("#penimbang").val('AUTO');
+		$("#permintaan").val('AUTO');					
+		$("#supplier").val('AUTO');					
+		$("#masuk").val('AUTO');					
+		$("#alamat").val('AUTO');					
+		$("#keluar").val('AUTO');					
+		$("#nopol").val('AUTO');					
+		$("#b_kotor").val(format_angka('AUTO'));					
+		$("#barang").val('AUTO');					
+		$("#berat_truk").val(format_angka('AUTO'));					
+		$("#sopir").val('AUTO');					
+		$("#berat_bersih").val(format_angka('AUTO'));					
+		$("#qty").val(format_angka('AUTO'));					
+		$("#cttn").val('AUTO');					
+		$("#pot").val(format_angka('AUTO'));	
 		load_hub()
 		hitung_total()
 		
@@ -781,14 +930,12 @@
 
 	function simpan() 
 	{
-		var id_stok_d   = $("#id_stok_d").val();
-		var qty         = $("#qty").val();
-		var tgl_inv     = $("#tgl_inv").val();
-		var nom         = $("#nom").val();
-		var id_hub      = $("#id_hub").val();
-		var total_bayar = $("#total_bayar").val();
+		var id_stok_d       = $("#id_stok_d").val();
+		var nom             = $("#nom").val();
+		var total_bayar     = $("#total_bayar").val();
+		var no_timbangan    = $("#no_timbangan").val();
 		
-		if ( id_stok_d=='' || qty=='' || tgl_inv== '' || nom=='' || id_hub=='' || total_bayar== '' ) 
+		if ( id_stok_d == '' || nom== '' || total_bayar == '' || total_bayar == 0 || no_timbangan == '') 
 		{
 			swal({
 				title               : "Cek Kembali",
