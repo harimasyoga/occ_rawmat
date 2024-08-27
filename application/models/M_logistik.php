@@ -45,7 +45,6 @@ class M_logistik extends CI_Model
 		}else{
 
 			$data_header = array(
-				'input_t'     	 => $this->input->post('plh_input'),
 				'no_timbangan'   => $this->input->post('no_timbangan'),
 				'id_hub_occ'     => $this->input->post('hub_occ'),
 				'jns'     		 => $this->input->post('jns'),
@@ -80,6 +79,54 @@ class M_logistik extends CI_Model
 		return [
 			'data' => $data,
 		];
+	}
+
+	function save_inv_bhn()
+	{
+		$status_input = $this->input->post('sts_input');
+		if($status_input == 'add')
+		{
+			$tgl_inv       = $this->input->post('tgl_inv');
+			$tanggal       = explode('-',$tgl_inv);
+			$tahun         = $tanggal[0];
+			$bulan         = $tanggal[1];
+			
+			$c_no_inv    = $this->m_fungsi->urut_transaksi('INV_BHN');
+			$m_no_inv    = $c_no_inv.'/INV/BHN/'.$bulan.'/'.$tahun;
+
+			$data_header = array(
+				'no_inv_bhn'    => $m_no_inv,
+				'no_timb'       => $this->input->post('no_timbangan'),
+				'tgl_inv_bhn'   => $this->input->post('tgl_inv'),
+				'qty'           => str_replace('.','',$this->input->post('qty')), 
+				'nominal'       => str_replace('.','',$this->input->post('nom')),
+				'total_bayar'   => str_replace('.','',$this->input->post('total_bayar')),
+				'acc_owner'     => 'N',
+				
+			);
+
+			$result_header = $this->db->insert('invoice_bhn', $data_header);
+
+			return $result_header;
+			
+		}else{
+			
+			$no_inv_bhn    = $this->input->post('no_inv_bhn');
+			$data_header = array(
+				'no_inv_bhn'    => $no_inv_bhn,
+				'no_timb'       => $this->input->post('no_timbangan'),
+				'tgl_inv_bhn'   => $this->input->post('tgl_inv'),
+				'qty'           => str_replace('.','',$this->input->post('qty')), 
+				'nominal'       => str_replace('.','',$this->input->post('nom')),
+				'total_bayar'   => str_replace('.','',$this->input->post('total_bayar')),
+				'acc_owner'     => 'N',
+			);
+
+			$this->db->where('id_inv_bhn', $this->input->post('id_inv_bhn'));
+			$result_header = $this->db->update('invoice_bhn', $data_header);
+			return $result_header;
+		}
+		
 	}
 
 	function save_invoice()
@@ -230,62 +277,6 @@ class M_logistik extends CI_Model
 
 		}
 			
-	}
-
-	function simpanGudang()
-	{
-		$id_gudang = $_POST["id_gudang"];
-		$good = $_POST["good"];
-		$reject = $_POST["reject"];
-		$opsi = $_POST["opsi"];
-		$id_pelanggan = $_POST["id_pelanggan"];
-		$id_produk = $_POST["id_produk"];
-		$no_po = $_POST["no_po"];
-		$i = $_POST["i"];
-
-		// UPDATE GUDANG
-		if($good < 0 || $good == 0 || $good == ""){
-			$data = false;
-			$msg = "HASIL TIDAK BOLEH KOSONG!";
-		}else if($reject < 0 || $reject == ""){
-			$data = false;
-			$msg = "REJECT HARUS DIISI!";
-		}else{
-			$this->db->set("gd_good_qty", $good);
-			$this->db->set("gd_reject_qty", $reject);
-			$this->db->set("gd_cek_spv", 'Close');
-			$this->db->where("id_gudang", $id_gudang);
-			$data = $this->db->update("m_gudang");
-			$msg = "OK!";
-		}
-
-		if($opsi == 'cor'){
-			$where = "AND g.gd_id_plan_cor!='0' AND g.gd_id_plan_flexo IS NULL AND g.gd_id_plan_finishing IS NULL";
-		}else if($opsi == 'flexo'){
-			$where = "AND g.gd_id_plan_cor!='0' AND g.gd_id_plan_flexo!='0' AND g.gd_id_plan_finishing IS NULL";
-		}else if($opsi == 'finishing'){
-			$where = "AND g.gd_id_plan_cor!='0' AND g.gd_id_plan_flexo!='0' AND g.gd_id_plan_finishing!='0'";
-		}else{
-			$where = "";
-		}
-		// UPDATE HEADER SPAN
-		$h_span = $this->db->query("SELECT COUNT(g.id_gudang) AS h_jml FROM m_gudang g
-		INNER JOIN m_pelanggan p ON g.gd_id_pelanggan=p.id_pelanggan
-		WHERE g.gd_cek_spv='Open' AND g.gd_id_pelanggan='$id_pelanggan' AND g.gd_id_produk='$id_produk' $where
-		GROUP BY p.nm_pelanggan,g.gd_id_produk")->row();
-		// UPDATE ISI SPAN
-		$i_span = $this->db->query("SELECT COUNT(g.id_gudang) AS i_jml FROM m_gudang g
-		INNER JOIN trs_wo w ON g.gd_id_trs_wo=w.id
-		WHERE g.gd_cek_spv='Open' AND g.gd_id_pelanggan='$id_pelanggan' AND g.gd_id_produk='$id_produk' AND w.kode_po='$no_po' $where
-		GROUP BY g.gd_id_pelanggan,g.gd_id_produk,w.kode_po")->row();
-
-		return [
-			'data' => $data,
-			'msg' => $msg,
-			'h_span' => $h_span,
-			'i_span' => $i_span,
-			'i' => $i,
-		];
 	}
 
 	function update_invoice()

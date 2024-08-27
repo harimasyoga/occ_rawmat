@@ -10,6 +10,7 @@ class Logistik extends CI_Controller
 		if ($this->session->userdata('status') != "login") {
 			redirect(base_url("Login"));
 		}
+		$this->load->model('m_fungsi');
 		$this->load->model('m_master');
 		$this->load->model('m_logistik');
 	}
@@ -152,10 +153,29 @@ class Logistik extends CI_Controller
 	function load_data_1()
 	{
 		$id       = $this->input->post('id');
-		$no_inv   = $this->input->post('no_inv');
+		$tbl      = $this->input->post('tbl');
+		$jenis    = $this->input->post('jenis');
+		$field    = $this->input->post('field');
 
-		$queryh   = "SELECT*FROM invoice_header where id='$id' and no_invoice='$no_inv'";
-		$queryd   = "SELECT*FROM invoice_detail where no_invoice='$no_inv' ";
+		if($jenis=='timbangan')
+		{
+			$queryh   = "SELECT *,a.jns FROM $tbl a JOIN m_hub b ON a.id_hub_occ=b.id_hub WHERE $field = '$id' ";
+			
+			$queryd   = "SELECT*FROM $tbl where $field = '$id' ";
+		}else if($jenis=='spill_timb')
+		{ 
+			$queryh   = "SELECT *,a.jns FROM m_jembatan_timbang a JOIN m_hub b ON a.id_hub_occ=b.id_hub  where $field = '$id' ORDER BY id_timbangan DESC";
+			
+			
+			$queryd   = "SELECT *,a.jns FROM m_jembatan_timbang a JOIN m_hub b ON a.id_hub_occ=b.id_hub  where $field = '$id' ORDER BY id_timbangan DESC";
+
+		}else{
+			$queryh   = "SELECT*FROM $tbl where no_invoice='$id'";
+			$queryd   = "SELECT*FROM invoice_detail where no_invoice='$id' ";
+
+		}
+
+		
 
 		$header   = $this->db->query($queryh)->row();
 		$detail    = $this->db->query($queryd)->result();
@@ -254,9 +274,11 @@ class Logistik extends CI_Controller
 					// }else{
 
 						$aksi = '
-						<a class="btn btn-sm btn-warning" href="' . base_url("Logistik/v_timbangan_edit?id_timb=" .$r->id_timbangan ."&no_timb=" .$r->no_timbangan ."") . '" title="EDIT DATA" >
+						<a class="btn btn-sm btn-warning" onclick="edit_data(' . $id . ',' . $no_timb . ')" title="EDIT DATA" >
 							<b><i class="fa fa-edit"></i> </b>
 						</a> 
+
+
 						<button type="button" title="DELETE" onclick="deleteTimbangan(' . $id . ',' . $no_timb . ')" class="btn btn-danger btn-sm">
 							<i class="fa fa-trash-alt"></i>
 
@@ -272,6 +294,105 @@ class Logistik extends CI_Controller
 				$data[] = $row;
 				$i++;
 			}
+		}else if ($jenis == "search_timbangan") {			
+			$query = $this->db->query("SELECT * FROM m_jembatan_timbang ORDER BY id_timbangan DESC")->result();
+
+			$i = 1;
+			foreach ($query as $r) {
+				
+				$id         = "'$r->id_timbangan'";
+				$no_timb    = "'$r->no_timbangan'";
+				
+				$print      = base_url('Logistik/printTimbangan?id='.$r->id_timbangan.'&top=10');
+				$printLampiran = base_url('Logistik/lampiranTimbangan?id='.$r->id_timbangan);
+				$row        = array();
+				$row[]      = '<div class="text-center">'.$i.'</div>';
+				$row[]      = '<div class="text-center">'.$r->no_timbangan.'</div>';
+				$row[]      = '<div class="text-center">'.substr($r->date_masuk,0,10).'</div>';
+				$row[]      = '<div class="text-center">'.$r->no_polisi.'</div>';
+				$row[]      = '<div class="text-center">'.$r->nm_sopir.'</div>';
+				$row[]      = $r->suplier;
+				$row[]      = $r->nm_barang;
+				$row[]      = $r->catatan;
+				$row[]      = '<div class="text-right"><b><a>'.number_format($r->berat_bersih, 0, ",", ".").' Kg</a></b></div>';
+				$aksi       = "";
+
+				if (in_array($this->session->userdata('level'), ['Admin','Pembayaran'])) 
+				{
+					$aksi = '
+					<button type="button" title="PILIH"  onclick="spilldata(' . $id . ',' . $no_timb . ')" class="btn btn-success btn-sm">
+						<i class="fas fa-check-circle"></i>
+					</button> ';
+					// }
+					
+				} else {
+					$aksi = '<a target="_blank" class="btn btn-sm btn-primary" href="'.$print.'" title="CETAK" ><b><i class="fa fa-print"></i> </b></a>';
+				}
+				$row[] = '<div class="text-center">'.$aksi.'</div>';
+				$data[] = $row;
+				$i++;
+			}
+		
+		}else if ($jenis == "inv_bhn") {			
+			$query = $this->db->query("SELECT*,b.jns from invoice_bhn a
+join m_jembatan_timbang b on a.no_timb=b.no_timbangan
+			join m_hub c on b.id_hub_occ=c.id_hub
+			order by tgl_inv_bhn desc, id_inv_bhn")->result();
+
+			$i               = 1;
+			foreach ($query as $r) {
+
+				$id           = "'$r->id_inv_bhn'";
+				$no_inv_bhn   = "'$r->no_inv_bhn'";
+
+				if($r->acc_owner=='N')
+                {
+                    $btn2   = 'btn-warning';
+                    $i2     = '<i class="fas fa-lock"></i>';
+                } else {
+                    $btn2   = 'btn-success';
+                    $i2     = '<i class="fas fa-check-circle"></i>';
+                }
+				
+				if (in_array($this->session->userdata('username'), ['owner','developer']))
+				{
+					$urll2 = "onclick=open_modal('$r->id_inv_bhn','$r->no_inv_bhn')";
+				} else {
+					$urll2 = '';
+				}
+					
+				$row    = array();
+				$row[]  = '<div class="text-center">'.$i.'</div>';
+				$row[]  = '<div class="text-center">'.$r->no_inv_bhn.'</div>';
+				$row[]  = '<div class="text-center">'.$r->no_timb.'</div>';
+				$row[]  = '<div class="text-center">'.$r->tgl_inv_bhn.'</div>';
+				$row[]  = $r->nm_hub;
+				$row[]  = '<div class="text-right">'.number_format($r->qty, 0, ",", ".").'</div>';
+				$row[]  = '<div class="text-right">'.number_format($r->nominal, 0, ",", ".").'</div>';
+				$row[]  = '<div class="text-right">'.number_format($r->qty * $r->nominal, 0, ",", ".").'</div>';
+				$row[]  = '
+						<div class="text-center"><a style="text-align: center;" class="btn btn-sm '.$btn2.' " '.$urll2.' title="VERIFIKASI DATA" ><b>'.$i2.' </b> </a><span style="font-size:1px;color:transparent">'.$r->acc_owner.'</span><div>';
+
+				$btncetak ='<a target="_blank" class="btn btn-sm btn-danger" href="' . base_url("Logistik/cetak_inv_bb2?no_inv_bhn="."$r->no_inv_bhn"."") . '" title="Cetak" ><i class="fas fa-print"></i> </a>';
+
+				$btnEdit = '<a class="btn btn-sm btn-warning" onclick="edit_data(' . $id . ',' . $no_inv_bhn . ')" title="EDIT DATA" >
+				<b><i class="fa fa-edit"></i> </b></a>';
+
+				$btnHapus = '<button type="button" title="DELETE"  onclick="deleteData(' . $id . ',' . $no_inv_bhn . ',' . $r->id_hub . ')" class="btn btn-danger btn-sm">
+				<i class="fa fa-trash-alt"></i></button> ';
+					
+				if (in_array($this->session->userdata('level'), ['Admin','User','Keuangan1']))
+				{
+					$row[] = '<div class="text-center">'.$btnEdit.' '.$btncetak.'</div>';
+
+				}else{
+					$row[] = '<div class="text-center"></div>';
+				}
+				
+				$data[] = $row;
+				$i++;
+			}
+		
 		}else{
 
 		}
@@ -288,6 +409,441 @@ class Logistik extends CI_Controller
 		$result = $this->m_logistik->deleteTimbangan();
 		echo json_encode($result);
 	}
+
+	function printTimbangan()
+	{
+		$html   = '';
+		$top    = $_GET["top"];
+		$id     = $_GET["id"];
+
+		$data = $this->db->query("SELECT*FROM m_jembatan_timbang WHERE id_timbangan='$id'")->row();
+
+		$html .= '<!DOCTYPE html>
+		<html lang="en">
+		<head>
+			<meta charset="UTF-8">
+			<meta name="viewport" content="width=device-width, initial-scale=1.0">
+			<link rel="icon" type="image/png" href="'.base_url('assets/gambar/ppi.png').'">
+			<title>TIMBANGAN - '.$data->id_timbangan.'</title>
+		</head>
+		<body style="font-family: Verdana, Geneva, Tahoma, sans-serif">
+		
+			<table style="text-align:center;border-collapse:collapse;width:100%;border-bottom:2px solid #000">
+				<tr>
+					<td style="font-weight:bold">PT. PRIMA PAPER INDONESIA</td>
+				</tr>
+				<tr>
+					<td style="font-size:10px">Timang Kulon, Wonokerto</td>
+				</tr>
+				<tr>
+					<td style="font-size:10px;padding-bottom:15px">WONOGIRI</td>
+				</tr>
+			</table>
+			<table style="margin-bottom:16px;font-size:12px;border-collapse:collapse">
+				<tr>
+					<td style="padding:2px 0">Suplier</td>
+					<td style="padding:0 4px 0 20px">:</td>
+					<td style="padding:2px 0">'.$data->suplier.'</td>
+				</tr>
+				<tr>
+					<td style="padding:2px 0">Alamat</td>
+					<td style="padding:0 4px 0 20px">:</td>
+					<td style="padding:2px 0">'.$data->alamat.'</td>
+				</tr>
+				<tr>
+					<td style="padding:2px 0">No. Polisi</td>
+					<td style="padding:0 4px 0 20px">:</td>
+					<td style="padding:2px 0">'.$data->no_polisi.'</td>
+				</tr>
+				<tr>
+					<td style="padding:2px 0">Masuk</td>
+					<td style="padding:0 4px 0 20px">:</td>
+					<td style="padding:2px 0">'.$this->m_fungsi->tanggal_ind(substr($data->date_masuk,0,10)).' &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; '.substr($data->date_masuk,11).'</td>
+				</tr>
+				<tr>
+					<td style="padding:2px 0">Keluar</td>
+					<td style="padding:0 4px 0 20px">:</td>
+					<td style="padding:2px 0">'.$this->m_fungsi->tanggal_ind(substr($data->date_keluar,0,10)).' &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; '.substr($data->date_keluar,11).'</td>
+				</tr>
+				<tr>
+					<td style="padding:2px 0">Barang</td>
+					<td style="padding:0 4px 0 20px">:</td>
+					<td style="padding:2px 0">'.$data->nm_barang.'</td>
+				</tr>
+			</table>
+			<table style="text-align:center;border-collapse:collapse;width:100%" border="1">
+				<tr>
+					<td style="border:0;width:2%;"></td>
+					<td style="border:0;width:30%;font-size:13px">BERAT KOTOR</td>
+					<td style="border:0;width:3%;"></td>
+					<td style="border:0;width:30%;font-size:13px">BERAT TRUK</td>
+					<td style="border:0;width:3%;"></td>
+					<td style="border:0;width:30%;font-size:13px">BERAT BERSIH</td>
+					<td style="border:0;width:2%;"></td>
+				</tr>
+				<tr>
+					<td style="border:0"></td>
+					<td style="padding:4px 0;font-weight:bold;font-size:17px">'.number_format($data->berat_kotor).'</td>
+					<td style="border:0"></td>
+					<td style="padding:4px 0;font-weight:bold;font-size:17px">'.number_format($data->berat_truk).'</td>
+					<td style="border:0"></td>
+					<td style="padding:4px 0;font-weight:bold;font-size:17px">'.number_format($data->berat_bersih).'</td>
+					<td style="border:0"></td>
+				</tr>
+				<tr>
+					<td style="border:0"></td>
+					<td style="border:0;text-align:left;font-size:14px">POTONGAN :</td>
+					<td style="border:0"></td>
+					<td style="border:0;font-size:14px">'.number_format($data->potongan).' KG</td>
+					<td style="border:0"></td>
+					<td style="border:0"></td>
+					<td style="border:0"></td>
+				</tr>
+				<tr>
+					<td style="border:0;padding:8px 0 23px;font-size:11px;text-align:left" colspan="7">Catatan : '.$data->catatan.'</td>
+				</tr>
+			</table>
+			<table style="width:100%;margin-bottom:5px;text-align:center;border-collapse:collapse;font-size:11px" border="1">
+				<tr>
+					<td style="border-bottom:0;padding-top:3px;width:32%">PENIMBANG</td>
+					<td style="border:0;width:2%"></td>
+					<td style="border-bottom:0;padding-top:3px;width:32%">SATPAM</td>
+					<td style="border:0;width:2%"></td>
+					<td style="border-bottom:0;padding-top:3px;width:32%">SOPIR</td>
+				</tr>
+				<tr>
+					<td style="border-top:0;border-bottom:0;padding:43px 0"></td>
+					<td style="border:0"></td>
+					<td style="border-top:0;border-bottom:0;padding:43px 0"></td>
+					<td style="border:0"></td>
+					<td style="border-top:0;border-bottom:0;padding:43px 0"></td>
+				</tr>
+				<tr>
+					<td style="border-top:0;padding-bottom:3px;">'.$data->nm_penimbang.'</td>
+					<td style="border:0"></td>
+					<td style="border-top:0;padding-bottom:3px;">(. . . . . . . . . .)</td>
+					<td style="border:0"></td>
+					<td style="border-top:0">'.$data->nm_sopir.'</td>
+				</tr>
+			</table>
+			<table style="width:100%;border-top:2px solid #000">
+				<tr>
+					<td style="text-align:right;font-size:12px">'.$data->keterangan.'</td>
+				</tr>
+			</table>
+
+		</body>
+		</html>';
+		
+		// $html .= '<div style="page-break-after:always"></div>';
+
+		// echo $html;
+		$judul = 'JEMBATAN TIMBANG - '.$id;
+		$this->m_fungsi->newMpdf($judul, '', $html, $top, 3, 3, 3, 'P', 'TT', $judul.'.pdf');
+	}
+
+	function lampiranTimbangan()
+	{
+		$id_timbangan = $_GET["id"];
+		$html = '';
+
+		$j_timbangan = $this->db->query("SELECT*FROM m_jembatan_timbang WHERE id_timbangan='$id_timbangan'");
+
+		$html .= '<table style="margin:0;padding:0;font-size:12px;border-collapse:collapse;color:#000;font-family:tahoma;width:100%">
+			<tr>
+				<th style="font-size:20px" rowspan="3">LAMPIRAN TIMBANGAN</th>
+				<th style="text-align:left">UD PATRIOT</th>
+			</tr>
+			<tr>
+				<th style="text-align:left">DUKUH MASARAN RT 34, DESA MASARAN</th>
+			</tr>
+			<tr>
+				<th style="text-align:left">KECAMATAN MASARAN, KABUPATEN SRAGEN, JAWA TENGAH</th>
+			</tr>
+			<tr>
+				<th style="padding:20px 0 40px;font-size:16px" colspan="2">NO TIMBANGAN : '.$j_timbangan->row()->no_timbangan.'</th>
+			</tr>
+		</table>';
+
+		$html .= '<table style="margin:0;padding:0;font-size:12px;border-collapse:collapse;color:#000;font-family:tahoma;width:100%">
+			<tr style="background:#f0b2b4">
+				<th style="padding:3px">NO</th>
+				<th style="padding:3px;text-align:left">CUSTOMER</th>
+				<th style="padding:3px;text-align:left">NO. STOK</th>
+				<th style="padding:3px;text-align:left">ITEM</th>
+				<th style="padding:3px">KEDATANGAN</th>
+			</tr>';
+
+			$data = $this->db->query("SELECT * FROM trs_h_stok_bb a
+			INNER JOIN trs_d_stok_bb b ON a.no_stok=b.no_stok 
+			INNER JOIN m_hub c ON b.id_hub=c.id_hub
+			INNER JOIN m_jembatan_timbang d ON a.no_timbangan=d.no_timbangan
+			INNER JOIN trs_po_bhnbk e ON b.no_po_bhn = e.no_po_bhn
+			WHERE a.id_timbangan='$id_timbangan'");
+			$i = 0;
+			foreach($data->result() as $r){
+				$i++;
+				$html .= '<tr>
+					<td style="padding:3px;text-align:center">'.$i.'</td>
+					<td style="padding:3px">'.$r->nm_hub.'</td>
+					<td style="padding:3px">'.$r->no_stok.'</td>
+					<td style="padding:3px">'.$r->nm_barang.'</td>
+					<td style="padding:3px;text-align:right">'.number_format($r->datang_bhn_bk,0,',','.').'</td>
+				</tr>';
+			}
+
+
+		$html .= '</table>';
+
+		$judul = 'LAMPIRAN';
+		$this->m_fungsi->newMpdf($judul, '', $html, 5, 5, 5, 5, 'P', 'A4', $judul.'.pdf');
+	}
+	
+	public function Invoice_bhn_bk()
+	{
+		$data = array(
+			'judul' => "Invoice Bahan Baku",
+		);
+		$this->load->view('header', $data);
+		$this->load->view('Logistik/v_invoice_bhn');
+		$this->load->view('footer');
+	}
+
+	function cetak_inv_bb2()
+	{
+		$no_inv_bhn        = $_GET['no_inv_bhn'];
+ 
+        $query_header = $this->db->query("SELECT*,b.jns,c.alamat as alamat_hub from invoice_bhn a
+join m_jembatan_timbang b on a.no_timb=b.no_timbangan
+			join m_hub c on b.id_hub_occ=c.id_hub
+			WHERE no_inv_bhn='$no_inv_bhn'
+			order by tgl_inv_bhn desc, id_inv_bhn"); 
+        
+        $data = $query_header->row();
+        
+        $querydetail = $this->db->query("SELECT*,b.jns,c.alamat as alamat_hub from invoice_bhn a
+join m_jembatan_timbang b on a.no_timb=b.no_timbangan
+			join m_hub c on b.id_hub_occ=c.id_hub
+			WHERE no_inv_bhn='$no_inv_bhn'
+			order by tgl_inv_bhn desc, id_inv_bhn");
+
+		$html = '';
+
+		// header
+
+		$nm_toko  = $data->nm_hub;
+		$alamat   = $data->alamat;
+		// $alamat2  = 'Kecamatan Masaran, Kabupaten Sragen, Jawa Tengah';
+		$phone    = $data->no_telp;
+		$whatsapp = $data->no_telp;
+		$kodepos  = $data->kode_pos;
+		$npwp     = '-';
+		$html .= "
+			 <table style=\"border-collapse:collapse;font-family: Century Gothic; font-size:12px; color:#000;\" width=\"100%\"  border=\"\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">
+			 <thead>
+				  <tr>
+					   <td rowspan=\"5\" align=\"center\">
+							<img src=\"" . base_url() . "assets/gambar/patriot.png\"  width=\"150\" height=\"50\" />
+					   </td>
+					   <td colspan=\"20\">
+							<b>
+								 <tr>
+									  <td align=\"left\" style=\"font-size:28;border-bottom: none;\"><b>$nm_toko</b></td>
+								 </tr>
+								 <tr>
+									  <td align=\"left\" style=\"font-size:10px;\">$alamat  Kode Pos $kodepos </td>
+								 </tr>
+								 <tr>
+									  <td align=\"left\" style=\"font-size:10px;\">Wa : $whatsapp  |  Telp : $phone </td>
+								 </tr>
+							</b>
+					   </td>
+				  </tr>
+			 </table>";
+		$html .= "
+			 <table style=\"border-collapse:collapse;font-family: tahoma; font-size:6px\" width=\"100%\" align=\"center\" border=\"0\">
+				  <tr>
+					   <td> &nbsp; </td>
+				  </tr> 
+			 </table>";
+
+		$html .= "
+			 <table style=\"border-collapse:collapse;font-family: tahoma; font-size:2px\" width=\"100%\" align=\"center\" border=\"1\">     
+				  <tr>
+					   <td colspan=\"20\" style=\"border-top: none;border-right: none;border-left: none;\"></td>
+				  </tr> 
+			 </table>";
+		$html .= "
+			 <table style=\"border-collapse:collapse;font-family: tahoma; font-size:4px\" width=\"100%\" align=\"center\" border=\"1\">     
+				  <tr>
+					   <td colspan=\"20\" style=\"border-top: none;border-right: none;border-left: none;border-bottom: 2px solid black;font-size:5px\"></td>
+				  </tr> 
+			 </table>";
+		$html .= "
+			 <table style=\"border-collapse:collapse;font-family: tahoma; font-size:8px\" width=\"100%\" align=\"center\" border=\"0\">     
+				  <tr> <td>&nbsp;</td> </tr> 
+			 </table>";
+		// end header
+
+		$html .= "
+			 <table style=\"border-collapse:collapse;font-family: tahoma; font-size:8px\" width=\"100%\" align=\"center\" border=\"0\">     
+				  <tr> <td>&nbsp;</td> </tr> 
+				  <tr> <td>&nbsp;</td> </tr> 
+			 </table>";
+
+		if ($query_header->num_rows() > 0) {
+
+            $html .= '<table width="100%" border="0" cellspacing="0" style="font-size:12px;font-family: Trebuchet MS, Helvetica, sans-serif;;">
+
+            <tr>
+				<td width="40%" rowspan="3" align="center" style="font-size:35px;"><b>INVOICE</b></td>
+				<td width="20%" rowspan="4"></td>
+				<td width="40%">Kepada</td>
+			</tr>
+            <tr>
+				<td><b>'.$data->nm_hub.'</b></td>
+			</tr>
+            <tr>
+				<td>'.$data->no_telp.'</td>
+			</tr>
+            <tr>
+				<td align="center">No.'.$data->no_inv_bhn.'</td>
+				<td>'.$data->alamat_hub.'</td>
+			</tr>
+            </table><br><br>';
+
+			$html .= '<table width="100%" border="0" cellspacing="1" cellpadding="3" style="border-collapse:collapse;font-size:12px;font-family: Trebuchet MS, Helvetica, sans-serif;;">
+                        <tr style="background-color: #f0b2b4">
+                            <th width="2%" align="center">NO</th>
+                            <th width="10%" align="center">ITEM</th>
+                            <th width="10%" align="center">JUMLAH</th>
+                            <th width="12%" align="center">SATUAN</th>
+                            <th width="8%" align="center">HARGA</th>
+                            <th width="10%" align="center">TOTAL </th>
+						</tr>';
+
+			$html .= '
+				<tr>
+					<td colspan="6" >&nbsp;</td>
+				</tr>';
+			$no = 1;
+			$tot_qty = $tot_value = $tot_total = 0;
+			foreach ($querydetail->result() as $r) {
+
+                $total = $r->nominal*$r->qty;
+				$html .= '
+				<tr >
+					<td align="center">' . $no . '</td>
+					<td align="center">' . $r->nm_barang . '</td>
+					<td align="center">' . number_format($r->qty, 0, ",", ".") . '</td>
+					<td align="center">Kg</td>
+					<td align="right">' . number_format($r->nominal, 0, ",", ".") . '</td>
+					<td align="right">' . number_format($total, 0, ",", ".") . '</td>
+					</tr>';
+
+				$no++;
+				$tot_total += $total;
+			}
+			$html .= '</table>';
+
+			
+			// $ppn11       = 0.11 * $tot_total;
+			$ppn11       = 0;
+			$total_all   = $ppn11 + $tot_total;
+
+			$html .= "
+			 <table style=\"border-collapse:collapse;font-family: tahoma; font-size:8px\" width=\"100%\" align=\"center\" border=\"0\">     
+				  <tr> <td>&nbsp;</td> </tr> 
+				  <tr> <td>&nbsp;</td> </tr> 
+				  <tr> <td>&nbsp;</td> </tr> 
+				  <tr> <td>&nbsp;</td> </tr>  
+			 </table>";
+
+
+		$html .= '<hr>
+		<table width="100%" border="0" cellspacing="0" style="font-size:12px;font-family: Trebuchet MS, Helvetica, sans-serif;">
+			<tr> 
+				<td colspan="4" style="border-width:2px 0;border-top:1px solid #000;">&nbsp;</td>
+			</tr>
+            <tr>
+				<td width="65%" ><b>TERBILANG :</b></td>
+				<td width="20%" ><b></b></td>
+				<td  width="15%" align="right" ></td>
+			</tr>
+            <tr>
+				<td rowspan="2" style="font-size:15px;"><b>'.$this->m_fungsi->terbilang($total_all).'</b></td>
+				<td><b>Sub Total Incl</b></td>
+				<td align="right"><b>Rp.' . number_format($total_all, 0, ",", ".") . '</b></td>
+			</tr>
+            <tr>
+				<td><b></b></td>
+				<td align="right"><b></b></td>
+			</tr>
+			<tr> 
+				<td colspan="4" style="border-width:2px 0;border-bottom:1px solid #000;">&nbsp;</td>
+			</tr>
+
+            </table><br><br>';
+
+		$html .= '<table width="100%" border="0" cellspacing="0" style="font-size:12px;font-family: ;">
+			<tr>
+				<td style="">Di Bayarkan Kepada :</td>
+				<td style="text-align:center">Sragen, '.$this->m_fungsi->tanggal_format_indonesia($data->tgl_inv_bhn).'</td> 
+			</tr>
+			<tr>
+				
+				<td style="">BCA 5050290672 </td>
+				<td style=""></td>
+			</tr>
+			<tr>
+				
+				<td style="">A.n UD.PATRIOT</td>
+				<td style=""></td>
+			</tr>
+			<tr>
+				
+				<td style="">&nbsp;</td>
+				<td style=""></td>
+			</tr>
+			<tr>
+				<td style="">* Harap bukti transfer di email ke</td>
+				<td style="border-bottom:1px solid #000;"></td>
+			</tr>
+			<tr>
+				<td style="">patriot@gmail.com</td>
+				<td style="text-align:center">Finance</td>
+			</tr>		
+			</table>
+			';
+
+
+		} else {
+			$html .= '<h1> Data Kosong </h1>';
+		}
+
+		$judul    = 'INVOICE';
+		$jdl_save = $no_inv_bhn;
+		$position = 'P';
+		$cekpdf   = '1';
+
+		switch ($cekpdf) {
+			case 0;
+				echo ("<title>$judul</title>");
+				echo ($html);
+				break;
+
+			case 1;
+				$this->m_fungsi->_mpdf_hari($position, 'A4', $judul, $html, $jdl_save.'.pdf', 5, 5, 5, 10,'','','',$data->nm_hub);
+				break;
+			case 2;
+				header("Cache-Control: no-cache, no-store, must-revalidate");
+				header("Content-Type: application/vnd-ms-excel");
+				header("Content-Disposition: attachment; filename= $judul.xls");
+				$this->load->view('app/master_cetak', $data);
+				break;
+		}
+	}
+
 	
 	function load_hub()
     {
@@ -427,61 +983,13 @@ class Logistik extends CI_Controller
 		print_r($json);
     }
 
-	function Insert_inv()
+	function insert_inv_bhn()
 	{
-
 		if($this->session->userdata('username'))
-		{
-
-			$c_no_inv_kd   = $this->input->post('no_inv_kd');
-			$c_no_inv      = $this->input->post('no_inv');
-			$c_no_inv_tgl  = $this->input->post('no_inv_tgl');
-			$cek_inv       = $this->input->post('cek_inv');
-
-			$no_inv_ok     = $c_no_inv_kd.''.$c_no_inv.''.$c_no_inv_tgl;
-			$query_cek_no  = $this->db->query("SELECT*FROM invoice_header where no_invoice='$no_inv_ok' ")->num_rows();
-
-			if($query_cek_no>0)
-			{
-				echo json_encode(array("status" => "3","id" => '0'));
-			}else{
-				
-				$c_type_po   = $this->input->post('type_po');
-				$c_pajak     = $this->input->post('pajak');
-				$asc         = $this->m_logistik->save_invoice();
-		
-				if($asc){
-		
-					($c_type_po=='roll')? $type_ok=$c_type_po : $type_ok='SHEET_BOX';
-			
-					($c_pajak=='nonppn')? $pajak_ok='non' : $pajak_ok='ppn';
-			
-					$no_urut    = $this->m_fungsi->tampil_no_urut($type_ok.'_'.$pajak_ok);
-					$kode_ok    = $type_ok.'_'.$pajak_ok;
-
-					if($cek_inv =='baru')
-					{
-						$this->db->query("UPDATE m_urut set no_urut=$no_urut+1 where kode='$kode_ok' ");
-					}else{
-						
-						if($c_no_inv == $no_urut)
-						{
-							$this->db->query("UPDATE m_urut set no_urut=$no_urut+1 where kode='$kode_ok' ");
-						}
-					}
-		
-					echo json_encode(array("status" =>"1","id" => $asc));
-		
-				}else{
-					echo json_encode(array("status" => "2","id" => $asc));
-		
-				}
-
-			}
-
+		{ 
+			$result = $this->m_logistik->save_inv_bhn();
+			echo json_encode($result);
 		}
-
-		
 		
 	}
 

@@ -63,7 +63,7 @@
 									<th style="text-align: center; width:10%">NO TIMBANGAN</th>
 									<th style="text-align: center; width:10%">REQ</th>
 									<th style="text-align: center; width:15%">TGL MASUK</th>
-									<th style="text-align: center; width:20%">SUPPLIER</th>
+									<th style="text-align: center; width:20%">CUST</th>
 									<th style="text-align: center; width:10%">JENIS</th>
 									<th style="text-align: center; width:20%">CATATAN</th>
 									<th style="text-align: center; width:10%">BERAT BERSIH</th>
@@ -167,7 +167,7 @@
 						</div>
 						<div class="col-md-1"></div>
 			
-						<div class="col-md-2">SUPPLIER</div>
+						<div class="col-md-2">CUSTOMER</div>
 						<div class="col-md-3">
 							<input type="text" name="supplier" id="supplier" class="form-control" value="PT. PRIMA PAPER INDONESIA" oninput="this.value = this.value.toUpperCase() ">
 						</div>
@@ -374,7 +374,7 @@
 		})
 	}
 	
-	function edit_data(id,kd_po)
+	function edit_data(id,no_timbangan)
 	{
 		$(".row-input").attr('style', '');
 		$(".row-list").attr('style', 'display:none');
@@ -383,9 +383,9 @@
 		$("#btn-simpan").html(`<button type="button" onclick="simpan()" class="btn-tambah-produk btn  btn-primary"><b><i class="fa fa-save" ></i> Update</b> </button>`)
 
 		$.ajax({
-			url        : '<?= base_url(); ?>Transaksi/load_data_1',
+			url        : '<?= base_url(); ?>Logistik/load_data_1',
 			type       : "POST",
-			data       : { id, tbl:'trs_po_bhnbk', jenis :'po_bahan_baku',field :'id_po_bhn' },
+			data       : { id, tbl:'m_jembatan_timbang', jenis :'timbangan',field :'id_timbangan' },
 			dataType   : "JSON",
 			beforeSend: function() {
 				swal({
@@ -400,15 +400,24 @@
 			success: function(data) {
 				if(data){
 					// header
-					$("#hub").val(data.header.hub).trigger('change');
-					$("#id_po_bhn").val(data.header.id_po_bhn);
-					$("#no_po_old").val(data.header.no_po_bhn);
-					$("#no_po").val(data.header.no_po_bhn);
-					$("#tgl_po").val(data.header.tgl_bhn);
-					$("#ton").val(format_angka(data.header.ton_bhn));
-					$("#harga").val(format_angka(data.header.hrg_bhn));
-					$("#aka").val(data.header.aka);
-					$("#total_po").val(format_angka(data.header.total));
+					$("#id_timbangan").val(data.header.id_timbangan);
+					$("#no_timbangan").val(data.header.no_timbangan);
+					$("#hub_occ").val(data.header.id_hub_occ).trigger('change');
+					$("#jns").val(data.header.jns).trigger('change');
+					$("#penimbang").val(data.header.nm_penimbang).trigger('change');
+					$("#permintaan").val(data.header.permintaan);					
+					$("#supplier").val(data.header.suplier);					
+					$("#masuk").val(data.header.date_masuk);					
+					$("#alamat").val(data.header.alamat);					
+					$("#keluar").val(data.header.date_keluar);					
+					$("#nopol").val(data.header.no_polisi);					
+					$("#b_kotor").val(format_angka(data.header.berat_kotor));					
+					$("#barang").val(data.header.nm_barang);					
+					$("#berat_truk").val(format_angka(data.header.berat_truk));					
+					$("#sopir").val(data.header.nm_sopir);					
+					$("#berat_bersih").val(format_angka(data.header.berat_bersih));					
+					$("#cttn").val(data.header.catatan);					
+					$("#pot").val(format_angka(data.header.potongan));		
 
 					swal.close();
 
