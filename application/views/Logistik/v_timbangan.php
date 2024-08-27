@@ -1,578 +1,426 @@
+<!-- Content Wrapper. Contains page content -->
 <div class="content-wrapper">
+	<!-- Content Header (Page header) -->
 	<section class="content-header">
 		<div class="container-fluid">
 			<div class="row mb-2">
-			<div class="col-sm-6"></div>
-			<div class="col-sm-6">
-				<ol class="breadcrumb float-sm-right"></ol>
+				<div class="col-sm-6">
+					<!-- <h1><b>Data Master</b></h1> -->
+				</div>
+				<div class="col-sm-6">
+					<ol class="breadcrumb float-sm-right">
+						<!-- <li class="breadcrumb-item active"><a href="#"><?= $judul ?></a></li> -->
+					</ol>
+				</div>
 			</div>
-			</div>
-		</div>
+		</div><!-- /.container-fluid -->
 	</section>
 
-	<style>
-		/* Chrome, Safari, Edge, Opera */
-		input::-webkit-outer-spin-button,
-		input::-webkit-inner-spin-button {
-			-webkit-appearance: none;
-			margin: 0;
-		}
-	</style>
-
+	<!-- Main content -->
 	<section class="content">
-		<div class="card shadow mb-3">
-			<div class="row-list">
-				<div class="card-header" style="font-family:Cambria;">		
-						<h3 class="card-title" style="color:#4e73df;"><b><?= $judul ?></b></h3>
-
-						<div class="card-tools">
-							<button type="button" class="btn btn-tool" data-card-widget="collapse" data-toggle="tooltip" title="Collapse">
-								<i class="fas fa-minus"></i></button>
-						</div>
-				</div>
-				<div class="card-body" >
-					<div class="row">
-					<?php if(in_array($this->session->userdata('level'), ['Admin','konsul_keu','Laminasi','User'])){ ?>
-						<div style="margin-bottom:12px; position: absolute;left: 20px;">
-							<button type="button" class="btn btn-sm btn-info" onclick="add_data()"><i class="fa fa-plus"></i> <b>TAMBAH DATA</b></button>
-						</div>
-
-						<div class="" style="position: absolute;left: 250px; font-weight:bold">
-								<select id="list_hub" class="form-control select2" onchange="load_data()">
-								<?php
-										$query = $this->db->query("SELECT*FROM m_hub order by id_hub");
-										$html ='';
-										$html .='<option value="">SEMUA</option>';
-										foreach($query->result() as $r){
-											$html .='<option value="'.$r->id_hub.'">'.$r->nm_hub.'</option>';
-										}
-										echo $html
-									?>
-								</select>
-						</div>
-						<?php } ?>
-					</div>
-					<br>
-					<br>
-					
-					<div style="overflow:auto;white-space:nowrap">
-						<table id="datatable_list" class="table table-bordered table-striped table-scrollable" width="100%">
-							<thead class="color-tabel">
-								<tr>
-									<th style="text-align: center; width:5%">NO.</th>
-									<th style="text-align: center; width:10%">NO TIMBANGAN</th>
-									<th style="text-align: center; width:10%">REQ</th>
-									<th style="text-align: center; width:15%">TGL MASUK</th>
-									<th style="text-align: center; width:20%">CUST</th>
-									<th style="text-align: center; width:10%">JENIS</th>
-									<th style="text-align: center; width:20%">CATATAN</th>
-									<th style="text-align: center; width:10%">BERAT BERSIH</th>
-									<th style="text-align: center; width:10%">AKSI</th>
-								</tr>
-							</thead>
-							<tbody></tbody>
-						</table>
-					</div>
-				</div>
-			</div>			
-		</div>
-	</section>
-
-	<section class="content">
-
 		<!-- Default box -->
-		<div class="card shadow row-input" style="display: none;">
-			<div class="card-header" style="font-family:Cambria;" >
-				<h3 class="card-title" style="color:#4e73df;"><b>INPUT PO BAHAN BAKU</b></h3>
+		<div class="card">
+			<div class="card-header" style="font-family:Cambria">
+				<h3 class="card-title" style="color:#4e73df;"><b><?= $judul ?></b></h3>
 
 				<div class="card-tools">
 					<button type="button" class="btn btn-tool" data-card-widget="collapse" data-toggle="tooltip" title="Collapse">
 						<i class="fas fa-minus"></i></button>
 				</div>
 			</div>
-			<form role="form" method="post" id="myForm">
-				<div class="col-md-12">
-								
-					<br>
-						
-					<div class="card-body row" style="padding-bottom:1px;font-weight:bold">			
-						
-						<div class="col-md-2">HUB</div>
-						<div class="col-md-9">
-							<select id="hub_occ" name="hub_occ" class="form-control select2" style="width: 100%" >
-							</select>
-
-						</div>
-						<!-- <div class="col-md-6"></div> -->
-					</div>
-					
-					<div class="card-body row" style="padding-bottom:1px;font-weight:bold">			
-						
-						<div class="col-md-2">NO TIMBANGAN</div>
-						<div class="col-md-3">
-							<input type="hidden" id="id_timbangan" name="id_timbangan" value="">
-							<input type="hidden" id="sts_input" name="sts_input" value="add">
-							<input type="text" class="form-control" id="no_timbangan" name="no_timbangan" value="OTOMATIS" readonly>
-
-						</div>
-						<div class="col-md-1"></div>
-			
-						<div class="col-md-2">PERMINTAAN</div>
-						<div class="col-md-3">
-							<input type="text" name="permintaan" id="permintaan" class="form-control" value="PPI" oninput="this.value = this.value.toUpperCase() ">
-						</div>
-					</div>
-					<div class="card-body row" style="padding-bottom:1px;font-weight:bold">			
-						
-						<div class="col-md-2">JENIS</div>
-						<div class="col-md-3">							
-							<select id="jns" name="jns" class="form-control select2" style="width: 100%" >
-								<option value="TERIMA">TERIMA</option>
-								<option value="KIRIM">KIRIM</option>
-								<option value="SUPLAI">SUPLAI</option>
-								<!-- <option value="STOK">STOK PPI</option> -->
-							</select>
-
-						</div>
-						<div class="col-md-1"></div>
-			
-						<div class="col-md-2">PENIMBANG</div>
-						<div class="col-md-3">
-							<select id="penimbang" name="penimbang" class="form-control select2">
-								<option value="Feri S">Feri S</option>
-								<option value="DWI J">DWI J</option>
-							</select>
-						</div>
-					</div>
-					<div class="card-body row" style="padding-bottom:1px;font-weight:bold">			
-						
-						<div class="col-md-2">MASUK</div>
-						<div class="col-md-3">
-							<input type="datetime-local" name="masuk" id="masuk" class="form-control" >
-
-						</div>
-						<div class="col-md-1"></div>
-			
-						<div class="col-md-2">CATATAN</div>
-						<div class="col-md-3">
-							<input type="text" name="cttn" id="cttn" class="form-control" oninput="this.value = this.value.toUpperCase() ">
-						</div>
-					</div>
-					<div class="card-body row" style="padding-bottom:1px;font-weight:bold">			
-						
-						<div class="col-md-2">KELUAR</div>
-						<div class="col-md-3">
-							<input type="datetime-local" name="keluar" id="keluar" class="form-control" >
-
-						</div>
-						<div class="col-md-1"></div>
-			
-						<div class="col-md-2">CUSTOMER</div>
-						<div class="col-md-3">
-							<input type="text" name="supplier" id="supplier" class="form-control" value="PT. PRIMA PAPER INDONESIA" oninput="this.value = this.value.toUpperCase() ">
-						</div>
-					</div>
-					<div class="card-body row" style="padding-bottom:1px;font-weight:bold">			
-						
-						<div class="col-md-2">BERAT KOTOR</div>
-						<div class="col-md-3">
-							<div class="input-group mb-3">
-								<input type="text" name="b_kotor" id="b_kotor" class="form-control angka" onkeyup="ubah_angka(this.value,this.id)">
-								<div class="input-group-append">
-									<span class="input-group-text">Kg</span>
-								</div>
-							</div>
-
-						</div>
-						<div class="col-md-1"></div>
-			
-						<div class="col-md-2">ALAMAT</div>
-						<div class="col-md-3">
-							<input type="text" name="alamat" id="alamat" class="form-control" value="Timang Kulon, Wonokerto, Wonogiri" oninput="this.value = this.value.toUpperCase() ">
-						</div>
-					</div>
-					<div class="card-body row" style="padding-bottom:1px;font-weight:bold">			
-						
-						<div class="col-md-2">BERAT TRUK</div>
-						<div class="col-md-3">
-							<div class="input-group mb-3">
-								<input type="text" name="berat_truk" id="berat_truk" class="form-control angka" onkeyup="ubah_angka(this.value,this.id)">
-								<div class="input-group-append">
-									<span class="input-group-text">Kg</span>
-								</div>
-							</div>			
-
-						</div>
-						<div class="col-md-1"></div>
-			
-						<div class="col-md-2">NO POLISI</div>
-						<div class="col-md-3">
-							<input type="text" name="nopol" id="nopol" class="form-control" oninput="this.value = this.value.toUpperCase() ">
-						</div>
-					</div>
-					<div class="card-body row" style="padding-bottom:1px;font-weight:bold">			
-						
-						<div class="col-md-2">BERAT BERSIH</div>
-						<div class="col-md-3">
-							<div class="input-group mb-3">
-								<input type="text" name="berat_bersih" id="berat_bersih" class="form-control angka" onkeyup="ubah_angka(this.value,this.id)">
-								<div class="input-group-append">
-									<span class="input-group-text">Kg</span>
-								</div>
-							</div>
-
-						</div>
-						<div class="col-md-1"></div>
-			
-						<div class="col-md-2">BARANG</div>
-						<div class="col-md-3">
-							<input type="text" name="barang" id="barang" class="form-control" value="OCC LOKAL" oninput="this.value = this.value.toUpperCase() ">
-						</div>
-					</div>
-					
-					<div class="card-body row" style="padding-bottom:1px;font-weight:bold">			
-						
-						<div class="col-md-2">POTONGAN</div>
-						<div class="col-md-3">
-							<div class="input-group mb-3">
-								<input type="text" name="pot" id="pot" class="angka form-control" onkeyup="ubah_angka(this.value,this.id)">
-								<div class="input-group-append">
-									<span class="input-group-text">Kg</span>
-								</div>
-							</div>
-
-						</div>
-						<div class="col-md-1"></div>
-			
-						<div class="col-md-2">SOPIR</div>
-						<div class="col-md-3">
-							<input type="text" name="sopir" id="sopir" class="form-control" oninput="this.value = this.value.toUpperCase() ">
-						</div>
-					</div>
-
-					
-					<br>
-				
-					<div class="card-body row"style="font-weight:bold">
-						<div class="col-md-4">
-							<button type="button" onclick="kembaliList()" class="btn-tambah-produk btn  btn-danger"><b>
-								<i class="fa fa-undo" ></i> Kembali</b>
-							</button>
-
-							<span id="btn-simpan"></span>
-
-						</div>
-						
-						<div class="col-md-6"></div>
-						
-					</div>
-
-					<br>
-					
+			<div class="card-body">
+				<?php if(in_array($this->session->userdata('level'), ['Admin','konsul_keu','User','Pembayaran'])){ ?>
+					<!-- <button type="button" style="font-family:Cambria;" class="tambah_data btn  btn-info pull-right"><i class="fa fa-plus"></i>&nbsp;&nbsp;<b>Tambah Data</b></button> -->
+					<a href="<?php echo base_url('Logistik/Timbangan/Add')?>" class="btn btn-info"><i class="fa fa-plus"></i> <b>Tambah Data</b></a>
+					<br><br>
+				<?php } ?>
+				<div style="overflow:auto;white-space:nowrap">
+					<table id="datatable" class="table table-bordered table-striped" width="100%">
+						<thead class="color-tabel">
+							<tr>
+								<th style="text-align: center; width:5%">NO.</th>
+								<th style="text-align: center; width:10%">NO TIMBANGAN</th>
+								<th style="text-align: center; width:10%">REQ</th>
+								<th style="text-align: center; width:15%">TGL MASUK</th>
+								<th style="text-align: center; width:20%">SUPPLIER</th>
+								<th style="text-align: center; width:10%">JENIS</th>
+								<th style="text-align: center; width:20%">CATATAN</th>
+								<th style="text-align: center; width:10%">BERAT BERSIH</th>
+								<th style="text-align: center; width:10%">AKSI</th>
+							</tr>
+						</thead>
+						<tbody>
+						</tbody>
+					</table>
 				</div>
-			</form>	
+			</div>
 		</div>
 		<!-- /.card -->
 	</section>
+	<!-- /.content -->
+</div>
+<!-- /.content-wrapper -->
+
+<div class="modal fade" id="modalForm">
+	<div class="modal-dialog modal-xl">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h4 class="modal-title" id="judul"></h4>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body">
+				<form role="form" method="post" id="myForm">
+					<div class="form-group row">
+						<label class="col-sm-2 col-form-label">INPUT</label>
+						<div class="col-sm-10">
+							<input type="hidden" id="id_timbangan" value="">
+							<input type="hidden" id="urut_t" value="">
+							<input type="hidden" id="tgl_t" value="">
+							<select id="plh_input" class="form-control select2" onchange="plhInput()"></select>
+						</div>
+					</div>
+					<div id="plh_kiriman"></div>
+					<div class="form-group row">
+						<label class="col-sm-2 col-form-label">PERMINTAAN</label>
+						<div class="col-sm-10">
+							<input type="text" class="form-control" id="permintaan" placeholder="-" autocomplete="off" maxlength="25" oninput="this.value = this.value.toUpperCase()">
+						</div>
+					</div>
+					<div class="form-group row">
+						<label class="col-sm-2 col-form-label">SUPPLIER</label>
+						<div class="col-sm-10">
+							<input type="text" class="form-control" id="supplier" placeholder="-" autocomplete="off" maxlength="25" oninput="this.value = this.value.toUpperCase()">
+						</div>
+					</div>
+					<div class="form-group row">
+						<label class="col-sm-2 col-form-label">ALAMAT</label>
+						<div class="col-sm-10">
+							<textarea class="form-control" id="alamat" placeholder="-" oninput="this.value = this.value.toUpperCase()"></textarea>
+						</div>
+					</div>
+					<div class="form-group row">
+						<label class="col-sm-2 col-form-label">NO POLISI</label>
+						<div class="col-sm-10">
+							<input type="text" class="form-control" id="nopol" placeholder="-" autocomplete="off" maxlength="25" oninput="this.value = this.value.toUpperCase()">
+						</div>
+					</div>
+					<div class="form-group row">
+						<label class="col-sm-2 col-form-label">TGL MASUK</label>
+						<div class="col-sm-10">
+							<input type="datetime-local" class="form-control" id="tgl_masuk">
+						</div>
+					</div>
+					<div class="form-group row">
+						<label class="col-sm-2 col-form-label">TGL KELUAR</label>
+						<div class="col-sm-10">
+							<input type="datetime-local" class="form-control" id="tgl_keluar">
+						</div>
+					</div>
+					<div class="form-group row">
+						<label class="col-sm-2 col-form-label">BARANG</label>
+						<div class="col-sm-10">
+							<input type="text" class="form-control" id="nm_barang" placeholder="-" autocomplete="off" maxlength="25" oninput="this.value = this.value.toUpperCase()">
+						</div>
+					</div>
+					<div class="form-group row">
+						<label class="col-sm-2 col-form-label">BERAT TRUK</label>
+						<div class="col-sm-10">
+							<input type="text" class="angka form-control" id="bb_truk" placeholder="-" autocomplete="off" maxlength="11">
+						</div>
+					</div>
+					<div class="form-group row">
+						<label class="col-sm-2 col-form-label">BERAT KOTOR</label>
+						<div class="col-sm-10">
+							<input type="text" class="angka form-control" id="bb_kotor" placeholder="-" autocomplete="off" maxlength="11">
+						</div>
+					</div>
+					<div class="form-group row">
+						<label class="col-sm-2 col-form-label">BERAT BERSIH</label>
+						<div class="col-sm-10">
+							<input type="text" class="angka form-control" id="bb_bersih" placeholder="-" autocomplete="off" maxlength="11">
+						</div>
+					</div>
+					<div class="form-group row">
+						<label class="col-sm-2 col-form-label">POTONGAN</label>
+						<div class="col-sm-10">
+							<input type="text" class="angka form-control" id="potongan" placeholder="KG" autocomplete="off" maxlength="11">
+						</div>
+					</div>
+					<div class="form-group row">
+						<label class="col-sm-2 col-form-label">CATATAN</label>
+						<div class="col-sm-10">
+							<input type="text" class="form-control" id="catatan" placeholder="-" autocomplete="off" maxlength="100" oninput="this.value = this.value.toUpperCase()">
+						</div>
+					</div>
+					<div class="form-group row">
+						<label class="col-sm-2 col-form-label">PENIMBANG</label>
+						<div class="col-sm-10">
+							<select id="nm_penimbang" class="form-control select2"></select>
+						</div>
+					</div>
+					<div class="form-group row">
+						<label class="col-sm-2 col-form-label">SOPIR</label>
+						<div class="col-sm-10">
+							<input type="text" class="form-control" id="nm_supir" placeholder="-" autocomplete="off" maxlength="25" oninput="this.value = this.value.toUpperCase()">
+						</div>
+					</div>
+					<div class="form-group row">
+						<label class="col-sm-2 col-form-label">KETERANGAN</label>
+						<div class="col-sm-10">
+							<input type="text" class="form-control" id="keterangan" placeholder="-" autocomplete="off" maxlength="25" oninput="this.value = this.value.toUpperCase()">
+						</div>
+					</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-primary" id="btn-simpan" onclick="simpanTimbangan()"><i class="fas fa-save"></i> Simpan</button>
+				<button type="button" class="btn btn-danger" data-dismiss="modalForm" onclick="close_modal();" ><i class="fa fa-times-circle"></i> <b> Batal</b></button>
+			</div>
+			</form>
+		</div>
+	</div>
 </div>
 
 <script type="text/javascript">
-
-	const urlAuth = '<?= $this->session->userdata('level')?>';
-
-	$(document).ready(function ()
-	{
-		kosong()
+	opsiInput = 'insert'
+	$(document).ready(function() {
+		$(".select2").select2()
 		load_data()
-		load_hub()
-		$('.select2').select2();
 	});
 
-	function load_hub() 
-	{
-		option = "";
+	$(".tambah_data").click(function(event) {
+		opsiInput = 'insert'
+		kosong()
+		$("#modalForm").modal("show")
+		$("#judul").html('<h3> Form Tambah Data</h3>')
+	});
+
+	function lampiranTimbangan(id_timbangan){
+		console.log(id_timbangan)
 		$.ajax({
-			type       : 'POST',
-			url        : "<?= base_url(); ?>Logistik/load_hub",
-			// data       : { idp: pelanggan, kd: '' },
-			dataType   : 'json',
-			beforeSend: function() {
-				swal({
-				title: 'loading ...',
-				allowEscapeKey    : false,
-				allowOutsideClick : false,
-				onOpen: () => {
-					swal.showLoading();
-				}
-				})
-			},
-			success:function(data){			
-				if(data.message == "Success"){					
-					option = `<option value="">-- Pilih --</option>`;	
-
-					$.each(data.data, function(index, val) {
-					option += `<option value="${val.id_hub}" data-aka="${val.aka}" >${val.nm_hub}</option>`;
-
-					});
-
-					$('#hub_occ').html(option);
-					swal.close();
-				}else{	
-					option += "<option value=''></option>";			
-					$('#hub_occ').html(option);					
-					swal.close();
-				}
+			url: '<?php echo base_url('Logistik/lampiranTimbangan')?>',
+			type: "POST",
+			data: ({ id_timbangan }),
+			success: function(res){
+				console.log(data)
 			}
-		});
+		})
 	}
 
-	function load_aka()
-	{
-		var aka = $('#hub option:selected').attr('data-aka');
-		$("#aka").val(aka)
-	}
-
-	function hitung_total()
-	{
-		var ton   = $("#ton").val().split('.').join('')
-		var harga = $("#harga").val().split('.').join('')
-
-		var total = ton*harga		
-		$("#total_po").val(format_angka(total))
-		
-	}
-
-	function reloadTable() 
-	{
-		table = $('#datatable_list').DataTable();
-		tabel.ajax.reload(null, false);
+	function close_modal(){
+		$('#modalLampiran').modal('hide');
 	}
 
 	function load_data() 
 	{
-		var list_hub    = $("#list_hub").val()
-		let table       = $('#datatable_list').DataTable();
+		var table = $('#datatable').DataTable();
 		table.destroy();
-		tabel = $('#datatable_list').DataTable({
+		tabel = $('#datatable').DataTable({
 			"processing": true,
 			"pageLength": true,
 			"paging": true,
 			"ajax": {
-				"url": '<?php echo base_url('Logistik/load_data/Timbangan')?>',
-				"type": "POST", 
-				"data"  : { id_hub:list_hub },
+				"url": '<?php echo base_url(); ?>Logistik/load_data/Timbangan',
+				"type": "POST",
 			},
-			"aLengthMenu": [
-				[5, 10, 50, 100, -1],
-				[5, 10, 50, 100, "Semua"]
-			],	
-			"responsive": false,
+			responsive: false,
 			"pageLength": 10,
 			"language": {
-				"emptyTable": "TIDAK ADA DATA.."
+				"emptyTable": "Tidak ada data.."
+			}
+		});
+	}
+
+	function reloadTable() {
+		table = $('#datatable').DataTable();
+		tabel.ajax.reload(null, false);
+	}
+
+	function kosong() {
+		$("#id_timbangan").val("")
+		$("#urut_t").val("")
+		$("#tgl_t").val("")
+		$("#plh_input").html(`<option value="">PILIH</option><option value="MANUAL">MANUAL</option><option value="CORR">CORR</option>`).prop("disabled", false)
+		$("#plh_kiriman").html("")
+		$("#permintaan").val("").prop("disabled", false)
+		$("#supplier").val("").prop("disabled", false)
+		$("#alamat").val("").prop("disabled", false)
+		$("#nopol").val("").prop("disabled", false)
+		$("#tgl_masuk").val("").prop("disabled", false)
+		$("#tgl_keluar").val("").prop("disabled", false)
+		$("#nm_barang").val("").prop("disabled", false)
+		$("#bb_kotor").val("").prop("disabled", false)
+		$("#bb_truk").val("").prop("disabled", false)
+		$("#bb_bersih").val("").prop("disabled", false)
+		$("#potongan").val("").prop("disabled", false)
+		$("#catatan").val("").prop("disabled", false)
+		$("#nm_penimbang").html(`<option value="">PILIH</option><option value="Feri S">Feri S</option><option value="DWI J">DWI J</option>`).prop("disabled", false)
+		$("#nm_supir").val("").prop("disabled", false)
+		$("#keterangan").val("").prop("disabled", false)
+		$("#btn-simpan").show().prop("disabled", false);
+		selectPilihKiriman()
+	}
+
+	function plhInput() {
+		let plh_input = $("#plh_input").val()
+		if(plh_input == 'CORR'){
+			loadSJTimbangan(plh_input)
+		}else if(plh_input == 'MANUAL'){
+			kosong()
+			$("#plh_input").val(plh_input)
+		}else{
+			kosong()
+		}
+	}
+
+	function loadSJTimbangan(plh_input) 
+	{
+		kosong()
+		$("#plh_input").val(plh_input)
+		$.ajax({
+			url: '<?php echo base_url('Logistik/loadSJTimbangan')?>',
+			type: "POST",
+			beforeSend: function() {
+				swal({
+					title: 'Loading',
+					allowEscapeKey: false,
+					allowOutsideClick: false,
+					onOpen: () => {
+						swal.showLoading();
+					}
+				});
+			},
+			success: function(res){
+				$("#plh_kiriman").html(res)
+				$('.select2').select2();
+				$("#supplier").val("PT. PRIMA PAPER INDONESIA").prop("disabled", true)
+				$("#alamat").val("Timang Kulon, Wonokerto, Wonogiri").prop("disabled", true)
+				$("#nm_barang").val("KARTON BOX").prop("disabled", true)
+				$("#permintaan").val('KIRIMAN').prop('disabled', true)
+				$("#keterangan").val('KIRIM').prop('disabled', true)
+				swal.close()
 			}
 		})
 	}
-	
-	function edit_data(id,no_timbangan)
+
+	function selectPilihKiriman(){
+		let no_kendaraan = $('#slc_plh_kiriman option:selected').attr('no_kendaraan')
+		let urut = $('#slc_plh_kiriman option:selected').attr('urut')
+		let tgl = $('#slc_plh_kiriman option:selected').attr('tgl')
+		let catatan = $('#slc_plh_kiriman option:selected').attr('catatan');
+		(no_kendaraan == undefined) ? prop = false : prop = true;
+		$("#nopol").val(no_kendaraan).prop("disabled", prop)
+		$("#catatan").val(catatan)
+	}
+
+	function simpanTimbangan() 
 	{
-		$(".row-input").attr('style', '');
-		$(".row-list").attr('style', 'display:none');
-		$("#sts_input").val('edit');
-
-		$("#btn-simpan").html(`<button type="button" onclick="simpan()" class="btn-tambah-produk btn  btn-primary"><b><i class="fa fa-save" ></i> Update</b> </button>`)
-
+		let urut = $('#slc_plh_kiriman option:selected').attr('urut')
+		let tgl = $('#slc_plh_kiriman option:selected').attr('tgl');
+		(urut == undefined) ? urut = '' : urut = urut;
+		(tgl == undefined) ? tgl = '' : tgl = tgl;
+		let id_timbangan = $("#id_timbangan").val()
+		let plh_input = $("#plh_input").val()
+		let permintaan = $("#permintaan").val()
+		let supplier = $("#supplier").val()
+		let alamat = $("#alamat").val()
+		let nopol = $("#nopol").val()
+		let tgl_masuk = $("#tgl_masuk").val()
+		let tgl_keluar = $("#tgl_keluar").val()
+		let nm_barang = $("#nm_barang").val()
+		let bb_kotor = $("#bb_kotor").val()
+		let bb_truk = $("#bb_truk").val()
+		let bb_bersih = $("#bb_bersih").val()
+		let potongan = $("#potongan").val()
+		let catatan = $("#catatan").val()
+		let nm_penimbang = $("#nm_penimbang").val()
+		let nm_supir = $("#nm_supir").val()
+		let keterangan = $("#keterangan").val()
 		$.ajax({
-			url        : '<?= base_url(); ?>Logistik/load_data_1',
-			type       : "POST",
-			data       : { id, tbl:'m_jembatan_timbang', jenis :'timbangan',field :'id_timbangan' },
-			dataType   : "JSON",
+			url: '<?php echo base_url('Logistik/simpanTimbangan')?>',
+			type: "POST",
 			beforeSend: function() {
 				swal({
-				title: 'loading data...',
-				allowEscapeKey    : false,
-				allowOutsideClick : false,
-				onOpen: () => {
-					swal.showLoading();
-				}
-				})
-			},
-			success: function(data) {
-				if(data){
-					// header
-					$("#id_timbangan").val(data.header.id_timbangan);
-					$("#no_timbangan").val(data.header.no_timbangan);
-					$("#hub_occ").val(data.header.id_hub_occ).trigger('change');
-					$("#jns").val(data.header.jns).trigger('change');
-					$("#penimbang").val(data.header.nm_penimbang).trigger('change');
-					$("#permintaan").val(data.header.permintaan);					
-					$("#supplier").val(data.header.suplier);					
-					$("#masuk").val(data.header.date_masuk);					
-					$("#alamat").val(data.header.alamat);					
-					$("#keluar").val(data.header.date_keluar);					
-					$("#nopol").val(data.header.no_polisi);					
-					$("#b_kotor").val(format_angka(data.header.berat_kotor));					
-					$("#barang").val(data.header.nm_barang);					
-					$("#berat_truk").val(format_angka(data.header.berat_truk));					
-					$("#sopir").val(data.header.nm_sopir);					
-					$("#berat_bersih").val(format_angka(data.header.berat_bersih));					
-					$("#cttn").val(data.header.catatan);					
-					$("#pot").val(format_angka(data.header.potongan));		
-
-					swal.close();
-
-				} else {
-
-					swal.close();
-					swal({
-						title               : "Cek Kembali",
-						html                : "Gagal Simpan",
-						type                : "error",
-						confirmButtonText   : "OK"
-					});
-					return;
-				}
-			},
-			error: function(jqXHR, textStatus, errorThrown) {
-				// toastr.error('Terjadi Kesalahan');
-				
-				swal.close();
-				swal({
-					title               : "Cek Kembali",
-					html                : "Terjadi Kesalahan",
-					type                : "error",
-					confirmButtonText   : "OK"
+					title: 'Loading',
+					allowEscapeKey: false,
+					allowOutsideClick: false,
+					onOpen: () => {
+						swal.showLoading();
+					}
 				});
-				
-				return;
+			},
+			data: ({
+				plh_input, permintaan, supplier, alamat, nopol, tgl_masuk, tgl_keluar, nm_barang, bb_kotor, bb_truk, bb_bersih, potongan, catatan, nm_penimbang, nm_supir, keterangan, urut, tgl, id_timbangan, opsiInput
+			}),
+			success: function(res){
+				data = JSON.parse(res)
+				if(data.data){
+					kosong()
+					reloadTable()
+					$("#modalForm").modal("hide")
+					toastr.success(`<b>${data.msg}</b>`)
+					swal.close()
+				}else{
+					swal(data.msg, '', 'error')
+					return
+				}
 			}
-		});
+		})
 	}
 
-	function kosong()
-	{
-		var tgl_now = '<?= date('Y-m-d') ?>'
-		$("#no_po_old").val("")
-		$("#id_po_bhn").val("")
-		$("#no_po").val("AUTO")
-		$("#ton").val("")
-		$("#tgl_po").val(tgl_now)
-		$("#harga").val("")
-		$("#hub").val("")
-		$("#total_po").val("")		
-		swal.close()
-	}
-
-	function simpan() 
-	{
-		var hub_occ    	  = $("#hub_occ").val();
-		var permintaan    = $("#permintaan").val();
-		var jns           = $("#jns").val();
-		var penimbang     = $("#penimbang").val();
-		var masuk         = $("#masuk").val();
-		var cttn          = $("#cttn").val();
-		var keluar        = $("#keluar").val();
-		var supplier      = $("#supplier").val();
-		var b_kotor       = $("#b_kotor").val();
-		var alamat        = $("#alamat").val();
-		var berat_truk    = $("#berat_truk").val();
-		var nopol         = $("#nopol").val();
-		var berat_bersih  = $("#berat_bersih").val();
-		var barang        = $("#barang").val();
-		var pot           = $("#pot").val();
-		var sopir         = $("#sopir").val();
-		
-		
-		if ( hub_occ  == '' || permintaan == '' || jns == '' || penimbang == '' || masuk == '' || cttn == '' || keluar == '' || supplier == '' || b_kotor == '' || b_kotor == 0 || berat_truk == '' || berat_truk == 0 || berat_bersih == '' || berat_bersih == 0 || alamat == '' || nopol == '' || barang == '' || pot == '' || sopir == '' ) 
-		{			
-			swal.close();
-			swal({
-				title               : "Cek Kembali",
-				html                : "Harap Lengkapi Form Dahulu",
-				type                : "info",
-				confirmButtonText   : "OK"
-			});
-			return;
+	function editTimbangan(id_timbangan, act) {
+		$("#modalForm").modal("show");
+		if(act == 'detail'){
+			$("#judul").html('<h3> Detail Data</h3>');
+			$("#btn-simpan").hide();
+		}else{
+			$("#judul").html('<h3> Form Edit Data</h3>');
+			$("#btn-simpan").show();
 		}
-
 		$.ajax({
-			url        : '<?= base_url(); ?>Logistik/simpanTimbangan',
-			type       : "POST",
-			data       : $('#myForm').serialize(),
-			dataType   : "JSON",
+			url: '<?php echo base_url('Logistik/editTimbangan')?>',
+			type: "POST",
+			data: ({ id_timbangan }),
 			beforeSend: function() {
-				swal({
-				title: 'loading ...',
-				allowEscapeKey    : false,
-				allowOutsideClick : false,
-				onOpen: () => {
-					swal.showLoading();
-				}
-				})
-			},
-			success: function(data) {
-				if(data == true){
-					// toastr.success('Berhasil Disimpan');
-					// swal.close();								
-					kosong();
-					location.href = "<?= base_url()?>Logistik/Timbangan";
 					swal({
-						title               : "Data",
-						html                : "Berhasil Disimpan",
-						type                : "success",
-						confirmButtonText   : "OK"
-					});
-					
-				} else {
-					// toastr.error('Gagal Simpan');
-					swal.close();
-					swal({
-						title               : "Cek Kembali",
-						html                : "Gagal Simpan",
-						type                : "error",
-						confirmButtonText   : "OK"
-					});
-					return;
-				}
-				reloadTable();
-			},
-			error: function(jqXHR, textStatus, errorThrown) {
-				// toastr.error('Terjadi Kesalahan');
-				
-				swal.close();
-				swal({
-					title               : "Cek Kembali",
-					html                : "Terjadi Kesalahan",
-					type                : "error",
-					confirmButtonText   : "OK"
-				});
-				
-				return;
+						title: 'loading ...',
+						allowEscapeKey    : false,
+						allowOutsideClick : false,
+						onOpen: () => {
+							swal.showLoading();
+						}
+					})
+				},
+			success: function(res){
+				data = JSON.parse(res)
+				$("#id_timbangan").val(id_timbangan)
+				$("#urut_t").val(data.data.urut_t)
+				$("#tgl_t").val(data.data.tgl_t)
+				$("#plh_input").html(`<option value="${data.data.input_t}">${data.data.input_t}</option>`).prop('disabled', true)
+				$("#plh_kiriman").html("")
+				$("#permintaan").val(data.data.permintaan).prop('disabled', (data.data.input_t == 'MANUAL') ? false : true)
+				$("#supplier").val(data.data.suplier).prop('disabled', (data.data.input_t == 'MANUAL') ? false : true)
+				$("#alamat").val(data.data.alamat).prop('disabled', (data.data.input_t == 'MANUAL') ? false : true)
+				$("#nopol").val(data.data.no_polisi).prop('disabled', (data.data.input_t == 'MANUAL') ? false : true)
+				$("#tgl_masuk").val(data.data.date_masuk)
+				$("#tgl_keluar").val(data.data.date_keluar)
+				$("#nm_barang").val(data.data.nm_barang).prop('disabled', (data.data.input_t == 'MANUAL') ? false : true)
+				$("#bb_kotor").val(data.data.berat_kotor)
+				$("#bb_truk").val(data.data.berat_truk)
+				$("#bb_bersih").val(data.data.berat_bersih)
+				$("#potongan").val(data.data.potongan)
+				$("#catatan").val(data.data.catatan).prop('disabled', (data.data.input_t == 'MANUAL') ? false : true)
+				$("#nm_penimbang").html(`<option value="${data.data.nm_penimbang}">${data.data.nm_penimbang}</option>`).prop('disabled', true)
+				$("#nm_supir").val(data.data.nm_sopir)
+				$("#keterangan").val(data.data.keterangan).prop('disabled', (data.data.input_t == 'MANUAL') ? false : true)
+				opsiInput = 'update'
+				swal.close()
 			}
-		});
-
+		})
 	}
 
-	function add_data()
-	{
-		kosong()
-		$(".row-input").attr('style', '')
-		$(".row-list").attr('style', 'display:none')
-		$("#sts_input").val('add');
-		
-		$("#btn-simpan").html(`<button type="button" onclick="simpan()" class="btn-tambah-produk btn  btn-primary"><b><i class="fa fa-save" ></i> Simpan</b> </button>`)
-	}
-
-	function kembaliList()
-	{
-		kosong()
-		reloadTable()
-		$(".row-input").attr('style', 'display:none')
-		$(".row-list").attr('style', '')
-	}
-
-	function deleteTimbangan(id_timbangan,no_timb) 
-	{
+	function deleteTimbangan(id_timbangan,no_timb) {
 		swal({
 			title : "TIMBANGAN",
 			html: "<p> Apakah Anda yakin ingin menghapus file ini ?</p><br>"
