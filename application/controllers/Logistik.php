@@ -317,17 +317,12 @@ class Logistik extends CI_Controller
 				$row[]      = '<div class="text-right"><b><a>'.number_format($r->berat_bersih, 0, ",", ".").' Kg</a></b></div>';
 				$aksi       = "";
 
-				if (in_array($this->session->userdata('level'), ['Admin','Pembayaran'])) 
-				{
-					$aksi = '
-					<button type="button" title="PILIH"  onclick="spilldata(' . $id . ',' . $no_timb . ')" class="btn btn-success btn-sm">
-						<i class="fas fa-check-circle"></i>
-					</button> ';
-					// }
-					
-				} else {
-					$aksi = '<a target="_blank" class="btn btn-sm btn-primary" href="'.$print.'" title="CETAK" ><b><i class="fa fa-print"></i> </b></a>';
-				}
+				$aksi = '
+				<button type="button" title="PILIH"  onclick="spilldata(' . $id . ',' . $no_timb . ')" class="btn btn-success btn-sm">
+					<i class="fas fa-check-circle"></i>
+				</button> ';
+				// }
+				
 				$row[] = '<div class="text-center">'.$aksi.'</div>';
 				$data[] = $row;
 				$i++;
