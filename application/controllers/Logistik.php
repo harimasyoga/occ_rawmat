@@ -295,7 +295,9 @@ class Logistik extends CI_Controller
 				$i++;
 			}
 		}else if ($jenis == "search_timbangan") {			
-			$query = $this->db->query("SELECT * FROM m_jembatan_timbang ORDER BY id_timbangan DESC")->result();
+			$query = $this->db->query("SELECT * FROM m_jembatan_timbang 
+where no_timbangan not in (select no_timb from invoice_bhn) 
+ORDER BY id_timbangan DESC")->result();
 
 			$i = 1;
 			foreach ($query as $r) {
@@ -709,10 +711,10 @@ join m_jembatan_timbang b on a.no_timb=b.no_timbangan
 				<td width="40%">Kepada</td>
 			</tr>
             <tr>
-				<td><b>'.$data->suplier.'</b></td>
+				<td><b><br>PT Prima Paper Indonesia</b></td>
 			</tr>
             <tr>
-				<td>'.$data->alamat.'</td>
+				<td>Timang Kulon, Wonokerto, Kec. Wonogiri, <br>Kabupaten Wonogiri, Jawa Tengah</td>
 			</tr>
             <tr>
 				<td align="center">No.'.$data->no_inv_bhn.'</td>
