@@ -613,7 +613,7 @@ join m_jembatan_timbang b on a.no_timb=b.no_timbangan
 	{
 		$no_inv_bhn        = $_GET['no_inv_bhn'];
  
-        $query_header = $this->db->query("SELECT*,b.jns,c.alamat as alamat_hub from invoice_bhn a
+        $query_header = $this->db->query("SELECT*,b.jns,c.alamat as alamat_hub,b.alamat from invoice_bhn a
 join m_jembatan_timbang b on a.no_timb=b.no_timbangan
 			join m_hub c on b.id_hub_occ=c.id_hub
 			WHERE no_inv_bhn='$no_inv_bhn'
@@ -621,7 +621,7 @@ join m_jembatan_timbang b on a.no_timb=b.no_timbangan
         
         $data = $query_header->row();
         
-        $querydetail = $this->db->query("SELECT*,b.jns,c.alamat as alamat_hub from invoice_bhn a
+        $querydetail = $this->db->query("SELECT*,b.jns,c.alamat as alamat_hub,b.alamat from invoice_bhn a
 join m_jembatan_timbang b on a.no_timb=b.no_timbangan
 			join m_hub c on b.id_hub_occ=c.id_hub
 			WHERE no_inv_bhn='$no_inv_bhn'
@@ -631,19 +631,29 @@ join m_jembatan_timbang b on a.no_timb=b.no_timbangan
 
 		// header
 
-		$nm_toko  = $data->nm_hub;
-		$alamat   = $data->alamat;
+		$nm_toko    = $data->nm_hub;
+		$logo_hub   = $data->logo;
+		$alamat     = $data->alamat_hub;
+		$alamat2    = $data->alamat2;
 		// $alamat2  = 'Kecamatan Masaran, Kabupaten Sragen, Jawa Tengah';
-		$phone    = $data->no_telp;
-		$whatsapp = $data->no_telp;
-		$kodepos  = $data->kode_pos;
-		$npwp     = '-';
+		$phone      = $data->no_telp;
+		$whatsapp   = $data->no_telp;
+		$kodepos    = $data->kode_pos;
+		$npwp       = '-';
 		$html .= "
 			 <table style=\"border-collapse:collapse;font-family: Century Gothic; font-size:12px; color:#000;\" width=\"100%\"  border=\"\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">
 			 <thead>
+				<tr>            
+					<td colspan=\"20\" style=\"background-color:#386fa4;font-size:20px;text-align:center;font-weight:bold\" >&nbsp;</td>
+				</tr>
+				
+				<tr>            
+					<td colspan=\"20\" style=\"font-size:10px;\" >&nbsp;</td>
+				</tr>
+
 				  <tr>
 					   <td rowspan=\"5\" align=\"center\">
-							<img src=\"" . base_url() . "assets/gambar/patriot.png\"  width=\"150\" height=\"50\" />
+							<img src=\"" . base_url() . "assets/gambar/".$logo_hub."\"  width=\"100\" height=\"100\" />
 					   </td>
 					   <td colspan=\"20\">
 							<b>
@@ -651,7 +661,10 @@ join m_jembatan_timbang b on a.no_timb=b.no_timbangan
 									  <td align=\"left\" style=\"font-size:28;border-bottom: none;\"><b>$nm_toko</b></td>
 								 </tr>
 								 <tr>
-									  <td align=\"left\" style=\"font-size:10px;\">$alamat  Kode Pos $kodepos </td>
+									  <td align=\"left\" style=\"font-size:10px;\">$alamat</td>
+								 </tr>
+								 <tr>
+									  <td align=\"left\" style=\"font-size:10px;\">$alamat2  Kode Pos $kodepos </td>
 								 </tr>
 								 <tr>
 									  <td align=\"left\" style=\"font-size:10px;\">Wa : $whatsapp  |  Telp : $phone </td>
@@ -693,7 +706,7 @@ join m_jembatan_timbang b on a.no_timb=b.no_timbangan
 
 		if ($query_header->num_rows() > 0) {
 
-            $html .= '<table width="100%" border="0" cellspacing="0" style="font-size:12px;font-family: Trebuchet MS, Helvetica, sans-serif;;">
+            $html .= '<table width="100%" border="0" cellspacing="0" style="font-size:12px;font-family: &quot;YACgEe79vK0 0&quot;, _fb_, auto;">
 
             <tr>
 				<td width="40%" rowspan="3" align="center" style="font-size:35px;"><b>INVOICE</b></td>
@@ -701,25 +714,24 @@ join m_jembatan_timbang b on a.no_timb=b.no_timbangan
 				<td width="40%">Kepada</td>
 			</tr>
             <tr>
-				<td><b>'.$data->nm_hub.'</b></td>
+				<td><b>'.$data->suplier.'</b></td>
 			</tr>
             <tr>
-				<td>'.$data->no_telp.'</td>
+				<td>'.$data->alamat.'</td>
 			</tr>
             <tr>
 				<td align="center">No.'.$data->no_inv_bhn.'</td>
-				<td>'.$data->alamat_hub.'</td>
 			</tr>
             </table><br><br>';
 
-			$html .= '<table width="100%" border="0" cellspacing="1" cellpadding="3" style="border-collapse:collapse;font-size:12px;font-family: Trebuchet MS, Helvetica, sans-serif;;">
-                        <tr style="background-color: #f0b2b4">
-                            <th width="2%" align="center">NO</th>
-                            <th width="10%" align="center">ITEM</th>
-                            <th width="10%" align="center">JUMLAH</th>
-                            <th width="12%" align="center">SATUAN</th>
-                            <th width="8%" align="center">HARGA</th>
-                            <th width="10%" align="center">TOTAL </th>
+			$html .= '<table width="100%" border="0" cellspacing="1" cellpadding="3" style="border-collapse:collapse;font-size:12px;font-family: Trebuchet MS, Helvetica, sans-serif;">
+                        <tr style="background-color: #386fa4;color:white;">
+                            <th style="color:white;" width="2%" align="center">NO</th>
+                            <th style="color:white;" width="10%" align="center">ITEM</th>
+                            <th style="color:white;" width="10%" align="center">JUMLAH</th>
+                            <th style="color:white;" width="12%" align="center">SATUAN</th>
+                            <th style="color:white;" width="8%" align="center">HARGA</th>
+                            <th style="color:white;" width="10%" align="center">TOTAL </th>
 						</tr>';
 
 			$html .= '
@@ -760,24 +772,22 @@ join m_jembatan_timbang b on a.no_timb=b.no_timbangan
 			 </table>";
 
 
-		$html .= '<hr>
-		<table width="100%" border="0" cellspacing="0" style="font-size:12px;font-family: Trebuchet MS, Helvetica, sans-serif;">
+		$html .= '
+		<table width="100%" border="0" cellspacing="0" style="font-size:12px;font-family: &quot;YACgEe79vK0 0&quot;, _fb_, auto;">
 			<tr> 
 				<td colspan="4" style="border-width:2px 0;border-top:1px solid #000;">&nbsp;</td>
 			</tr>
             <tr>
-				<td width="65%" ><b>TERBILANG :</b></td>
+				<td width="50%" ><b>TERBILANG :</b></td>
+				<td width="15%" ><b></b></td>
 				<td width="20%" ><b></b></td>
-				<td  width="15%" align="right" ></td>
+				<td width="15%" align="right" ></td>
 			</tr>
             <tr>
-				<td rowspan="2" style="font-size:15px;"><b>'.$this->m_fungsi->terbilang($total_all).'</b></td>
-				<td><b>Sub Total Incl</b></td>
-				<td align="right"><b>Rp.' . number_format($total_all, 0, ",", ".") . '</b></td>
-			</tr>
-            <tr>
+				<td style="font-size:10px;"><b>'.$this->m_fungsi->terbilang($total_all).'</b></td>
 				<td><b></b></td>
-				<td align="right"><b></b></td>
+				<td><b>Total Incl</b></td>
+				<td align="right"><b>Rp.' . number_format($total_all, 0, ",", ".") . '</b></td>
 			</tr>
 			<tr> 
 				<td colspan="4" style="border-width:2px 0;border-bottom:1px solid #000;">&nbsp;</td>
@@ -792,12 +802,12 @@ join m_jembatan_timbang b on a.no_timb=b.no_timbangan
 			</tr>
 			<tr>
 				
-				<td style="">BCA 5050290672 </td>
+				<td style="">'.$data->nm_bank.' '.$data->no_rek.' </td>
 				<td style=""></td>
 			</tr>
 			<tr>
 				
-				<td style="">A.n UD.PATRIOT</td>
+				<td style="">A.n '.$data->nm_hub.'</td>
 				<td style=""></td>
 			</tr>
 			<tr>
@@ -806,11 +816,11 @@ join m_jembatan_timbang b on a.no_timb=b.no_timbangan
 				<td style=""></td>
 			</tr>
 			<tr>
-				<td style="">* Harap bukti transfer di email ke</td>
+				<td style="">&nbsp;</td>
 				<td style="border-bottom:1px solid #000;"></td>
 			</tr>
 			<tr>
-				<td style="">patriot@gmail.com</td>
+				<td style="">&nbsp;</td>
 				<td style="text-align:center">Finance</td>
 			</tr>		
 			</table>
