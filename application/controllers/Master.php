@@ -96,6 +96,140 @@ class Master extends CI_Controller
 		echo json_encode($output);
 	}
 
+	function rekap_all_inv_bahan()
+	{
+		$priode       = $_POST['priode'];
+		$attn         = $_POST['id_hub'];
+		$tgl_awal     = $_POST['tgl_awal'];
+		$tgl_akhir    = $_POST['tgl_akhir'];
+
+		if($attn=='' || $attn== null || $attn== 'null')
+		{
+			if($priode=='all')
+			{
+				$value="";
+			}else{
+				$value="where a.tgl_inv_bhn BETWEEN  '$tgl_awal' and  '$tgl_akhir'";
+			}
+
+		}else{
+			if($priode=='all')
+			{
+				$value="where c.id_hub='$attn' ";
+			}else{
+				$value="where c.id_hub='$attn' and a.tgl_inv_bhn BETWEEN  '$tgl_awal' and  '$tgl_akhir'";
+			}
+
+		}
+
+		$rekap_jumlah = $this->m_master->query("SELECT IFNULL(sum(qty*nominal),0)jumlah from invoice_bhn a
+			join m_jembatan_timbang b on a.no_timb=b.no_timbangan
+			join m_hub c on b.id_hub_occ=c.id_hub
+		$value
+			order by tgl_inv_bhn desc, id_inv_bhn
+			")->row();
+
+		$data     = ["rekap_jumlah" => $rekap_jumlah];
+
+        echo json_encode($data);
+	}
+	
+	function rekap_timb_bahan()
+	{
+		$priode       = $_POST['priode'];
+		$attn         = $_POST['id_hub'];
+		$tgl_awal     = $_POST['tgl_awal'];
+		$tgl_akhir    = $_POST['tgl_akhir'];
+
+		if($attn=='' || $attn== null || $attn== 'null')
+		{
+			if($priode=='all')
+			{
+				$value="";
+			}else{
+				$value="where a.date_masuk BETWEEN  '$tgl_awal' and  '$tgl_akhir'";
+			}
+
+		}else{
+			if($priode=='all')
+			{
+				$value="where c.id_hub='$attn' ";
+			}else{
+				$value="where c.id_hub='$attn' and a.date_masuk BETWEEN  '$tgl_awal' and  '$tgl_akhir'";
+			}
+
+		}
+
+		$data = array();
+
+		$query = $this->m_master->query("SELECT *,a.jns FROM m_jembatan_timbang a JOIN m_hub b ON a.id_hub_occ=b.id_hub
+		$value
+			ORDER BY date_masuk desc,id_timbangan DESC
+			")->result();
+	
+		
+		$i = 1;
+
+		foreach ($query as $r) {
+			$row = array();
+			$row[] = "<div class='text-center'>".$i."</div>";
+			$row[] = $r->no_timbangan;
+			$row[] = "<div class='text-center'>".$r->date_masuk."</div>";
+			$row[] = $r->nm_hub;
+			$row[] = number_format($r->berat_bersih,0,',','.')." Kg";
+
+			// $idSales = $r->id;
+			// $cekPO = $this->db->query("SELECT COUNT(c.id_sales) AS jmlSales FROM trs_po p INNER JOIN m_pelanggan c ON p.id_pelanggan=c.id_pelanggan
+			// WHERE c.id_sales='$idSales' GROUP BY c.id_sales")->num_rows();
+			$btnEdit = '<button type="button" class="btn btn-warning btn-sm" onclick="tampil_edit('."'".$r->no_timbangan."'".','."'edit'".')"><i class="fas fa-pen"></i></button>';
+			// $row[] = ($cekPO == 0) ? $btnEdit.' '.$btnHapus : $btnEdit;
+			// $row[] = $btnEdit;
+			$data[] = $row;
+			$i++;
+		}
+		$output = array(
+			"data" => $data,
+		);
+		//output to json format
+		echo json_encode($output);
+	}
+
+	function rekap_all_timb_bahan()
+	{
+		$priode       = $_POST['priode'];
+		$attn         = $_POST['id_hub'];
+		$tgl_awal     = $_POST['tgl_awal'];
+		$tgl_akhir    = $_POST['tgl_akhir'];
+
+		if($attn=='' || $attn== null || $attn== 'null')
+		{
+			if($priode=='all')
+			{
+				$value="";
+			}else{
+				$value="where a.date_masuk BETWEEN  '$tgl_awal' and  '$tgl_akhir'";
+			}
+
+		}else{
+			if($priode=='all')
+			{
+				$value="where a.id_hub_occ='$attn' ";
+			}else{
+				$value="where a.id_hub_occ='$attn' and a.date_masuk BETWEEN  '$tgl_awal' and  '$tgl_akhir'";
+			}
+
+		}
+
+		$rekap_jumlah = $this->m_master->query("SELECT *,a.jns FROM m_jembatan_timbang a JOIN m_hub b ON a.id_hub_occ=b.id_hub
+		$value
+			ORDER BY date_masuk desc,id_timbangan DESC
+			")->row();
+
+		$data     = ["rekap_jumlah" => $rekap_jumlah];
+
+        echo json_encode($data);
+	}
+
 	function Customer()
 	{
 		$data = array(
