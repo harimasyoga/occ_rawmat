@@ -18,12 +18,84 @@ class Master extends CI_Controller
 	{
 		$data = array(
 			'judul' => "Dashboard",
+			'level' => $this->session->userdata('level'),
 		);
 		$this->load->view('header',$data );
-		$this->load->view('home');
+
+		if (in_array($this->session->userdata('level'), ['Admin' ,'Owner']))
+		{			
+			$this->load->view('dashboard');
+		}else{
+			$this->load->view('home');
+		}
+		
 		$this->load->view('footer');
 	}
 	
+	function rekap_inv_bahan()
+	{
+		$priode       = $_POST['priode'];
+		$attn         = $_POST['id_hub'];
+		$tgl_awal     = $_POST['tgl_awal'];
+		$tgl_akhir    = $_POST['tgl_akhir'];
+
+		if($attn=='' || $attn== null || $attn== 'null')
+		{
+			if($priode=='all')
+			{
+				$value="";
+			}else{
+				$value="where a.tgl_inv_bhn BETWEEN  '$tgl_awal' and  '$tgl_akhir'";
+			}
+
+		}else{
+			if($priode=='all')
+			{
+				$value="where c.id_hub='$attn' ";
+			}else{
+				$value="where c.id_hub='$attn' and a.tgl_inv_bhn BETWEEN  '$tgl_awal' and  '$tgl_akhir'";
+			}
+
+		}
+
+		$data = array();
+
+		$query = $this->m_master->query("SELECT*,b.jns from invoice_bhn a
+			join m_jembatan_timbang b on a.no_timb=b.no_timbangan
+			join m_hub c on b.id_hub_occ=c.id_hub
+		$value
+			order by tgl_inv_bhn desc, id_inv_bhn
+			")->result();
+	
+		
+		$i = 1;
+
+		foreach ($query as $r) {
+			$row = array();
+			$row[] = "<div class='text-center'>".$i."</div>";
+			$row[] = $r->no_inv_bhn;
+			$row[] = "<div class='text-center'>".$r->tgl_inv_bhn."</div>";
+			$row[] = $r->nm_hub;
+			$row[] = "Rp ".number_format($r->qty,0,',','.');
+			$row[] = number_format($r->nominal,0,',','.')." Kg";
+			$row[] = "<div style='font-weight:bold;' class='text-right'> Rp ".number_format($r->qty*$r->nominal,0,',','.')."</div>";
+
+			// $idSales = $r->id;
+			// $cekPO = $this->db->query("SELECT COUNT(c.id_sales) AS jmlSales FROM trs_po p INNER JOIN m_pelanggan c ON p.id_pelanggan=c.id_pelanggan
+			// WHERE c.id_sales='$idSales' GROUP BY c.id_sales")->num_rows();
+			$btnEdit = '<button type="button" class="btn btn-warning btn-sm" onclick="tampil_edit('."'".$r->no_inv_bhn."'".','."'edit'".')"><i class="fas fa-pen"></i></button>';
+			// $row[] = ($cekPO == 0) ? $btnEdit.' '.$btnHapus : $btnEdit;
+			// $row[] = $btnEdit;
+			$data[] = $row;
+			$i++;
+		}
+		$output = array(
+			"data" => $data,
+		);
+		//output to json format
+		echo json_encode($output);
+	}
+
 	function Customer()
 	{
 		$data = array(

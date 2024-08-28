@@ -169,6 +169,21 @@ class Logistik extends CI_Controller
 			
 			$queryd   = "SELECT *,a.jns FROM m_jembatan_timbang a JOIN m_hub b ON a.id_hub_occ=b.id_hub  where $field = '$id' ORDER BY id_timbangan DESC";
 
+		}else if($jenis=='edit_inv_bhn')
+		{ 
+			$queryh   = "SELECT*,b.jns from invoice_bhn a
+			join m_jembatan_timbang b on a.no_timb=b.no_timbangan
+			join m_hub c on b.id_hub_occ=c.id_hub
+			where $field = '$id'
+			order by tgl_inv_bhn desc, id_inv_bhn";
+			
+			
+			$queryd   = "SELECT*,b.jns from invoice_bhn a
+			join m_jembatan_timbang b on a.no_timb=b.no_timbangan
+			join m_hub c on b.id_hub_occ=c.id_hub
+			where $field = '$id'
+			order by tgl_inv_bhn desc, id_inv_bhn";
+
 		}else{
 			$queryh   = "SELECT*FROM $tbl where no_invoice='$id'";
 			$queryd   = "SELECT*FROM invoice_detail where no_invoice='$id' ";
@@ -264,31 +279,35 @@ class Logistik extends CI_Controller
 
 				if (in_array($this->session->userdata('level'), ['Admin','User'])) 
 				{
-					// $cek = $this->db->query("SELECT * FROM trs_h_stok_bb where no_timbangan='$r->no_timbangan' ")->num_rows();
+					$cek = $this->db->query("SELECT * FROM invoice_bhn where no_timb='$r->no_timbangan' ")->num_rows();
 
-					// if($cek>0)
-					// {
-					// 	$aksi = '
-					// 	<a target="_blank" class="btn btn-sm btn-primary" href="'.$print.'" title="CETAK" ><b><i class="fa fa-print"></i> </b></a>
-					// 	<a target="_blank" class="btn btn-sm btn-secondary" href="'.$printLampiran.'" title="LAMPIRAN"><i class="fas fa-paperclip" style="color:#fff"></i></a>';
-					// }else{
+					if($cek>0)
+					{
+						$aksi = '
+						<a class="btn btn-sm btn-primary" onclick=edit_data(' . $id . ',' . $no_timb . ',"look") title="PREVIEW DATA" >
+							<b><i class="fa fa-eye"></i> </b>
+						</a> 
+
+						<a target="_blank" class="btn btn-sm btn-danger" href="'.$print.'" title="CETAK" ><b><i class="fa fa-print"></i> </b></a>
+						';
+					}else{
 
 						$aksi = '
-						<a class="btn btn-sm btn-warning" onclick="edit_data(' . $id . ',' . $no_timb . ')" title="EDIT DATA" >
+						<a class="btn btn-sm btn-warning" onclick=edit_data(' . $id . ',' . $no_timb . ',"editt") title="EDIT DATA" >
 							<b><i class="fa fa-edit"></i> </b>
 						</a> 
 
 
-						<button type="button" title="DELETE" onclick="deleteTimbangan(' . $id . ',' . $no_timb . ')" class="btn btn-danger btn-sm">
+						<button type="button" title="DELETE" onclick="deleteTimbangan(' . $id . ',' . $no_timb . ')" class="btn btn-secondary btn-sm">
 							<i class="fa fa-trash-alt"></i>
 
 						</button> 
-						<a target="_blank" class="btn btn-sm btn-primary" href="'.$print.'" title="CETAK" ><b><i class="fa fa-print"></i> </b></a>
-						<a target="_blank" class="btn btn-sm btn-secondary" href="'.$printLampiran.'" title="LAMPIRAN"><i class="fas fa-paperclip" style="color:#fff"></i></a>';
-					// }
+						<a target="_blank" class="btn btn-sm btn-danger" href="'.$print.'" title="CETAK" ><b><i class="fa fa-print"></i> </b></a>
+						';
+					}
 					
 				} else {
-					$aksi = '<a target="_blank" class="btn btn-sm btn-primary" href="'.$print.'" title="CETAK" ><b><i class="fa fa-print"></i> </b></a>';
+					$aksi = '<a target="_blank" class="btn btn-sm btn-danger" href="'.$print.'" title="CETAK" ><b><i class="fa fa-print"></i> </b></a>';
 				}
 				$row[] = '<div class="text-center">'.$aksi.'</div>';
 				$data[] = $row;
@@ -296,8 +315,8 @@ class Logistik extends CI_Controller
 			}
 		}else if ($jenis == "search_timbangan") {			
 			$query = $this->db->query("SELECT * FROM m_jembatan_timbang 
-where no_timbangan not in (select no_timb from invoice_bhn) 
-ORDER BY id_timbangan DESC")->result();
+			where no_timbangan not in (select no_timb from invoice_bhn) 
+			ORDER BY id_timbangan DESC")->result();
 
 			$i = 1;
 			foreach ($query as $r) {
@@ -332,10 +351,10 @@ ORDER BY id_timbangan DESC")->result();
 		
 		}else if ($jenis == "inv_bhn") {			
 			$query = $this->db->query("SELECT*,b.jns from invoice_bhn a
-join m_jembatan_timbang b on a.no_timb=b.no_timbangan
+			join m_jembatan_timbang b on a.no_timb=b.no_timbangan
 			join m_hub c on b.id_hub_occ=c.id_hub
 			order by tgl_inv_bhn desc, id_inv_bhn")->result();
-
+ 
 			$i               = 1;
 			foreach ($query as $r) {
 
@@ -375,15 +394,15 @@ join m_jembatan_timbang b on a.no_timb=b.no_timbangan
 				$btnEdit = '<a class="btn btn-sm btn-warning" onclick="edit_data(' . $id . ',' . $no_inv_bhn . ')" title="EDIT DATA" >
 				<b><i class="fa fa-edit"></i> </b></a>';
 
-				$btnHapus = '<button type="button" title="DELETE"  onclick="deleteData(' . $id . ',' . $no_inv_bhn . ',' . $r->id_hub . ')" class="btn btn-danger btn-sm">
+				$btnHapus = '<button type="button" title="DELETE"  onclick="deleteData(' . $id . ',' . $no_inv_bhn . ')" class="btn btn-secondary btn-sm">
 				<i class="fa fa-trash-alt"></i></button> ';
 					
-				if (in_array($this->session->userdata('level'), ['Admin','User','Keuangan1']))
+				if (in_array($this->session->userdata('level'), ['Admin','User']))
 				{
-					$row[] = '<div class="text-center">'.$btnEdit.' '.$btncetak.'</div>';
+					$row[] = '<div class="text-center">'.$btnEdit.' '.$btncetak.''.$btnHapus.'</div>';
 
 				}else{
-					$row[] = '<div class="text-center"></div>';
+					$row[] = '<div class="text-center">'.$btncetak.'</div>';
 				}
 				
 				$data[] = $row;
@@ -604,6 +623,14 @@ join m_jembatan_timbang b on a.no_timb=b.no_timbangan
 		$this->load->view('header', $data);
 		$this->load->view('Logistik/v_invoice_bhn');
 		$this->load->view('footer');
+	}
+
+	function prosesData()
+	{
+		$jenis    = $_POST['jenis'];
+		$result   = $this->m_logistik->$jenis();
+
+		echo json_encode($result);
 	}
 
 	function cetak_inv_bb2()

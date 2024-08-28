@@ -374,13 +374,21 @@
 		})
 	}
 	
-	function edit_data(id,no_timbangan)
+	function edit_data(id,no_timbangan,cek)
 	{
 		$(".row-input").attr('style', '');
 		$(".row-list").attr('style', 'display:none');
 		$("#sts_input").val('edit');
 
-		$("#btn-simpan").html(`<button type="button" onclick="simpan()" class="btn-tambah-produk btn  btn-primary"><b><i class="fa fa-save" ></i> Update</b> </button>`)
+		if(cek=='editt'){
+
+			$("#btn-simpan").html(`<button type="button" onclick="simpan()" class="btn-tambah-produk btn  btn-primary"><b><i class="fa fa-save" ></i> Update</b> </button>`)
+			lock(cek);
+		}else{
+			$("#btn-simpan").html(``)
+			lock(cek);
+
+		}
 
 		$.ajax({
 			url        : '<?= base_url(); ?>Logistik/load_data_1',
@@ -461,6 +469,49 @@
 		$("#hub").val("")
 		$("#total_po").val("")		
 		swal.close()
+	}
+
+	function lock(cek)
+	{
+		if(cek=='editt')
+		{
+			$("#hub_occ").prop("disabled", false);
+			$("#jns").prop("disabled", false);
+			$("#penimbang").prop("disabled", false);
+			$("#permintaan").prop("disabled", false);					
+			$("#supplier").prop("disabled", false);					
+			$("#masuk").prop("disabled", false);					
+			$("#alamat").prop("disabled", false);					
+			$("#keluar").prop("disabled", false);					
+			$("#nopol").prop("disabled", false);					
+			$("#b_kotor").prop("disabled", false);					
+			$("#barang").prop("disabled", false);					
+			$("#berat_truk").prop("disabled", false);					
+			$("#sopir").prop("disabled", false);					
+			$("#berat_bersih").prop("disabled", false);					
+			$("#cttn").prop("disabled", false);					
+			$("#pot").prop("disabled", false);
+		}else{
+			$("#id_timbangan").prop("disabled", true);
+			$("#no_timbangan").prop("disabled", true);
+			$("#hub_occ").prop("disabled", true);
+			$("#jns").prop("disabled", true);
+			$("#penimbang").prop("disabled", true);
+			$("#permintaan").prop("disabled", true);					
+			$("#supplier").prop("disabled", true);					
+			$("#masuk").prop("disabled", true);					
+			$("#alamat").prop("disabled", true);					
+			$("#keluar").prop("disabled", true);					
+			$("#nopol").prop("disabled", true);					
+			$("#b_kotor").prop("disabled", true);					
+			$("#barang").prop("disabled", true);					
+			$("#berat_truk").prop("disabled", true);					
+			$("#sopir").prop("disabled", true);					
+			$("#berat_bersih").prop("disabled", true);					
+			$("#cttn").prop("disabled", true);					
+			$("#pot").prop("disabled", true);
+		}
+
 	}
 
 	function simpan() 

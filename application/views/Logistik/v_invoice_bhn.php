@@ -161,6 +161,7 @@
 						<div class="col-md-2">HUB</div>
 						<div class="col-md-3">
 							<input type="text" class="form-control" id="hub_occ" name="hub_occ" value="AUTO" readonly>
+							<input type="hidden" class="form-control" id="aka_hub_occ" name="aka_hub_occ" value="AUTO" readonly>
 							</select>
 
 						</div>
@@ -362,9 +363,9 @@
 
 <!-- MODAL box -->
 <div class="modal fade" id="modalForm">
-	<div class="modal-dialog modal-full">
+	<div class="modal-dialog modal-xl">
 		<div class="modal-content">
-			<div class="card-header" style="font-family:Cambria;" >
+			<div class="modal-header" style="font-family:Cambria;" >
 				<h4 class="card-title" style="color:#4e73df;" id="judul"></h4>
 				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 					<span aria-hidden="true">&times;</span>
@@ -372,13 +373,28 @@
 			</div>
 			<div class="col-md-12">
 				<br>				
-				<div class="card-body row" style="padding-bottom:1px;font-weight:bold">						
+					
+				<div class="modal-body row" style="padding-bottom:1px;font-weight:bold">						
 					<div class="col-md-2">No Invoice</div>
 					<div class="col-md-3">
-						<input type="hidden" name="m_id_inv_bhn" id="m_id_inv_bhn">
 						<input type="text" class="angka form-control" name="m_no_inv_bhn" id="m_no_inv_bhn" value="AUTO" readonly>
 					</div>
-					<div class="col-md-1"></div>						
+					<div class="col-md-1"></div>
+					<div class="col-md-2">NO TIMBANGAN</div>
+					<div class="col-md-3">
+						<div class="input-group">								
+							<input type="text" class="form-control" id="m_no_timbangan" name="m_no_timbangan" value="AUTO" readonly>
+						</div>
+					</div>	
+
+				</div>
+				
+				<div class="modal-body row" style="padding-bottom:1px;font-weight:bold">			
+					<div class="col-md-2">Tanggal Invoice</div>
+					<div class="col-md-3">
+						<input type="date" class="form-control" name="m_tgl_inv" id="m_tgl_inv" value ="<?= date('Y-m-d') ?>" readonly>
+					</div>
+					<div class="col-md-1"></div>	
 					<div class="col-md-2">Qty</div>
 					<div class="col-md-3">
 						<div class="input-group mb-1">
@@ -389,16 +405,11 @@
 							</div>	
 								
 						</div>
-					</div>		
-
+					</div>	
 				</div>
 				
-				<div class="card-body row" style="padding-bottom:1px;font-weight:bold">			
-					<div class="col-md-2">Tanggal Invoice</div>
-					<div class="col-md-3">
-						<input type="date" class="form-control" name="m_tgl_inv" id="m_tgl_inv" value ="<?= date('Y-m-d') ?>" readonly>
-					</div>
-					<div class="col-md-1"></div>	
+				<div class="modal-body row" style="padding-bottom:1px;font-weight:bold">								
+					
 					<div class="col-md-2">Harga</div>
 					<div class="col-md-3">
 						<div class="input-group mb-1">
@@ -409,15 +420,7 @@
 							<input type="text" class="angka form-control" name="m_nom" id="m_nom"  onkeyup="ubah_angka(this.value,this.id),hitung_total()" readonly>
 								
 						</div>
-					</div>			
-
-				</div>
-				
-				<div class="card-body row" style="padding-bottom:1px;font-weight:bold">								
-					<div class="col-md-2">Cust</div>
-					<div class="col-md-3">
-						<input class="form-control" type="text" name="m_id_hub" id="m_id_hub" readonly>
-					</div>
+					</div>		
 					<div class="col-md-1"></div>
 					<div class="col-md-2">Total Bayar</div>
 					<div class="col-md-3">
@@ -431,29 +434,21 @@
 						</div>
 					</div>
 				</div>
-				
-				<div class="card-body row" style="padding-bottom:1px;font-weight:bold">			
-							
-					<div class="col-md-2">Keterangan</div>
-					<div class="col-md-3">
-						<textarea type="text" class="form-control" name="m_ket" id="m_ket" ></textarea readonly>
-					</div>
-					<div class="col-md-6"></div>
-				</div>
+					
 				
 				<br>
 
-				<div class="card-body row"style="font-weight:bold">
-					<div class="col-md-4">
+				<div class="modal-footer"style="font-weight:bold">
+					<!-- <div class="col-md-4"> -->
 						<!-- <span id="btn-simpan"></span> -->
 						<span id="modal_btn_verif"></span>
 						
 						<button type="button" class="btn btn-danger" data-dismiss="modal"  ><i class="fa fa-undo"></i> <b> Batal</b></button>
 
 
-					</div>
+					<!-- </div> -->
 					
-					<div class="col-md-6"></div>
+					<!-- <div class="col-md-6"></div> -->
 					
 				</div>
 
@@ -567,6 +562,7 @@
 					// header
 					$("#no_timbangan").val(data.header.no_timbangan);
 					$("#hub_occ").val(data.header.nm_hub);
+					$("#aka_hub_occ").val(data.header.aka);
 					$("#jns").val(data.header.jns);
 					$("#penimbang").val(data.header.nm_penimbang);
 					$("#permintaan").val(data.header.permintaan);					
@@ -575,11 +571,11 @@
 					$("#alamat").val(data.header.alamat);					
 					$("#keluar").val(data.header.date_keluar);					
 					$("#nopol").val(data.header.no_polisi);					
-					$("#b_kotor").val(format_angka(data.header.berat_kotor));					
+					$("#b_kotor").val(format_angka(data.header.berat_kotor));
 					$("#barang").val(data.header.nm_barang);					
-					$("#berat_truk").val(format_angka(data.header.berat_truk));					
+					$("#berat_truk").val(format_angka(data.header.berat_truk));
 					$("#sopir").val(data.header.nm_sopir);					
-					$("#berat_bersih").val(format_angka(data.header.berat_bersih));					
+					$("#berat_bersih").val(format_angka(data.header.berat_bersih));
 					$("#qty").val(format_angka(data.header.berat_bersih));					
 					$("#cttn").val(data.header.catatan);					
 					$("#pot").val(format_angka(data.header.potongan));	
@@ -662,19 +658,19 @@
 		})
 	}
 	
-	function edit_data(id,no_po)
+	function edit_data(id,no_inv_bhn)
 	{
 		$(".row-input").attr('style', '');
 		$(".row-list").attr('style', 'display:none');
 		$("#sts_input").val('edit');
 
-		// $("#btn-simpan").html(`<button type="button" onclick="simpan()" class="btn-tambah-produk btn  btn-primary"><b><i class="fa fa-save" ></i> Update</b> </button>`)
-		$("#btn-simpan").html(``)
+		$("#btn-simpan").html(`<button type="button" onclick="simpan()" class="btn-tambah-produk btn  btn-primary"><b><i class="fa fa-save" ></i> Update</b> </button>`)
+		// $("#btn-simpan").html(``)
 
 		$.ajax({
 			url        : '<?= base_url(); ?>Logistik/load_data_1',
 			type       : "POST",
-			data       : { id, jenis :'edit_inv_bhn' },
+			data       : { id : no_inv_bhn, tbl:'invoice_bhn', jenis :'edit_inv_bhn',field :'no_inv_bhn'  },
 			dataType   : "JSON",
 			beforeSend: function() {
 				swal({
@@ -688,18 +684,34 @@
 			},
 			success: function(data) {
 				if(data){
-					// header
+					// header 
 					$("#id_inv_bhn").val(data.header.id_inv_bhn);
 					$("#no_inv_bhn").val(data.header.no_inv_bhn);
-					$("#id_stok_d").val(data.header.id_stok_d);
-					$("#no_stok").val(data.header.no_stok);
-					$("#tgl_inv").val(data.header.tgl_inv_bhn);
-					$("#id_hub").val(data.header.id_hub).trigger('change');
-					$("#ket").val(data.header.ket);
 					$("#qty").val(format_angka(data.header.qty));
 					$("#nom").val(format_angka(data.header.nominal));
 					var total = data.header.qty*data.header.nominal
-					$("#total_bayar").val(format_angka(total));						
+					$("#total_bayar").val(format_angka(total));	
+					
+					// LIST ITEM
+					$("#no_timbangan").val(data.header.no_timbangan);
+					$("#hub_occ").val(data.header.nm_hub);
+					$("#aka_hub_occ").val(data.header.aka);
+					$("#jns").val(data.header.jns);
+					$("#penimbang").val(data.header.nm_penimbang);
+					$("#permintaan").val(data.header.permintaan);					
+					$("#supplier").val(data.header.suplier);					
+					$("#masuk").val(data.header.date_masuk);					
+					$("#alamat").val(data.header.alamat);					
+					$("#keluar").val(data.header.date_keluar);					
+					$("#nopol").val(data.header.no_polisi);					
+					$("#b_kotor").val(format_angka(data.header.berat_kotor));
+					$("#barang").val(data.header.nm_barang);					
+					$("#berat_truk").val(format_angka(data.header.berat_truk));
+					$("#sopir").val(data.header.nm_sopir);					
+					$("#berat_bersih").val(format_angka(data.header.berat_bersih));
+					$("#qty").val(format_angka(data.header.berat_bersih));					
+					$("#cttn").val(data.header.catatan);					
+					$("#pot").val(format_angka(data.header.potongan));	
 					swal.close();
 					hitung_total()	
 
@@ -732,7 +744,7 @@
 	}
 
 	// MODAL //
-	function open_modal(id,no_invoice) 
+	function open_modal(id,no_inv_bhn) 
 	{		
 		$("#modalForm").modal("show");
 		$("#judul").html('<h3> VERIFIKASI OWNER </h3>');
@@ -740,7 +752,7 @@
 		$.ajax({
 			url        : '<?= base_url(); ?>Logistik/load_data_1',
 			type       : "POST",
-			data       : { id, jenis :'edit_inv_bhn' },
+			data       : { id : no_inv_bhn, tbl:'invoice_bhn', jenis :'edit_inv_bhn',field :'no_inv_bhn' },
 			dataType   : "JSON",
 			beforeSend: function() {
 				swal({
@@ -752,13 +764,13 @@
 				}
 				})
 			},
+
 			success: function(data) {
 				if(data){
 					// header
 					$("#m_no_inv_bhn").val(data.header.no_inv_bhn);
+					$("#m_no_timbangan").val(data.header.no_timb);
 					$("#m_tgl_inv").val(data.header.tgl_inv_bhn);
-					$("#m_id_hub").val(data.header.nm_hub);
-					$("#m_ket").val(data.header.ket);
 					$("#m_qty").val(format_angka(data.header.qty));
 					$("#m_nom").val(format_angka(data.header.nominal));
 					var total = data.header.qty*data.header.nominal
@@ -1042,7 +1054,7 @@
 				url: '<?= base_url(); ?>Logistik/hapus',
 				data: ({
 					id         : no_inv_bhn,
-					jenis      : 'inv_beli',
+					jenis      : 'invoice_bhn',
 					field      : 'no_inv_bhn'
 				}),
 				type: "POST",
