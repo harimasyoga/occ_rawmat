@@ -158,7 +158,7 @@
                             <div class="col-md-1"></div>
                             <div class="col-md-2">ATTN</div>
                             <div class="col-md-3">
-                              <select class="form-control select2" name="id_hub_timb" id="id_hub_timb" style="width: 100%;" onchange="">
+                              <select class="form-control select2" name="id_hub_timb" id="id_hub_timb" style="width: 100%;" onchange="load_timb_bahan()">
                               </select>
                             </div>
                           </div>
@@ -166,7 +166,7 @@
                           <div class="card-body row" style="padding-bottom:1px;font-weight:bold;display:none" id="tgl_awal_list_timb" >						
                             <div class="col-md-2">Tgl Awal</div>
                             <div class="col-md-3">
-                              <input type="date" class="form-control" name="tgl_awal_timb" id="tgl_awal_timb" onchange="" value ="<?= date('Y-m-d') ?>">
+                              <input type="date" class="form-control" name="tgl_awal_timb" id="tgl_awal_timb" onchange="load_timb_bahan()" value ="<?= date('Y-m-d') ?>">
                             </div>
                             <div class="col-md-6"></div>
                           </div>
@@ -174,7 +174,7 @@
                           <div class="card-body row" style="padding-bottom:1px;font-weight:bold;display:none" id="tgl_akhir_list_timb" >						
                             <div class="col-md-2">Tgl Akhir</div>
                             <div class="col-md-3">
-                              <input type="date" class="form-control" name="tgl_akhir_timb" id="tgl_akhir_timb" onchange="" value ="<?= date('Y-m-d') ?>">
+                              <input type="date" class="form-control" name="tgl_akhir_timb" id="tgl_akhir_timb" onchange="load_timb_bahan()" value ="<?= date('Y-m-d') ?>">
                             </div>
                             <div class="col-md-6"></div>
                           </div>
@@ -201,11 +201,11 @@
                                 </tbody>
                                 <tfoot>
                                   <tr>
-                                    <td colspan="6" class="text-right">
+                                    <td colspan="4" class="text-right">
                                       <label for="total">TOTAL</label>
                                     </td>	
                                     <td>
-                                      <div class="mb-1 text-right" style="font-weight:bold;color:red">
+                                      <div class="mb-1 text-left" style="font-weight:bold;color:red">
                                         <!-- <input type="text" size="5" name="total_nom_timb" id="total_nom" style="font-weight:bold;color:red" class="angka form-control text-right" value='0' readonly> -->
                                         <span id="total_all_timb_bhn"></span>
                                       </div>
@@ -242,7 +242,7 @@
       $(".select2").select2()
       <?php if(in_array($level, ['Admin','User','Owner','Hub'])){ ?>        
         load_inv_bahan()
-        // load_timb_bahan()
+        load_timb_bahan()
       <?php } ?>
       load_hub_bhn() 
     });
@@ -251,7 +251,7 @@
     {
       <?php if(in_array($level, ['Admin','User','Owner','Hub'])){ ?>
         load_inv_bahan()  
-        // load_timb_bahan()
+        load_timb_bahan()
       <?php } ?>
       load_hub_bhn() 
     }
@@ -276,11 +276,11 @@
 
       if($cek=='all' )
       {
-        $('#tgl_awal_timb').hide("1000");
-        $('#tgl_akhir_timb').hide("1000");
+        $('#tgl_awal_list_timb').hide("1000");
+        $('#tgl_akhir_list_timb').hide("1000");
       }else{
-        $('#tgl_awal_timb').show("1000");
-        $('#tgl_akhir_timb').show("1000");
+        $('#tgl_awal_list_timb').show("1000");
+        $('#tgl_akhir_list_timb').show("1000");
       }
     }
 
@@ -413,10 +413,10 @@
       var priode_timb       = $('#priode_timb').val()
       var tgl_awal_timb     = $('#tgl_awal_timb').val()
       var tgl_akhir_timb    = $('#tgl_akhir_timb').val()
-      var table = $('#dt_load_timb_bahan').DataTable();
+      var table2 = $('#dt_load_timb_bahan').DataTable();
 
-      table.destroy();
-      tabel = $('#dt_load_timb_bahan').DataTable({
+      table2.destroy();
+      tabel2 = $('#dt_load_timb_bahan').DataTable({
         "processing": true,
         "pageLength": true,
         "paging": true,
@@ -436,7 +436,7 @@
           "emptyTable": "Tidak ada data.."
         }
       });
-      // total_timb_bhn();
+      total_timb_bhn();
     }
 
     function total_timb_bhn()
@@ -458,7 +458,7 @@
           if(data){
             // header
             $("#total_all_timb_bhn").html(`
-            <div> Rp${format_angka(data.rekap_jumlah.jumlah)}
+            <div>${format_angka(data.rekap_jumlah.jumlah)} Kg
             </div>`);
             swal.close();
 
