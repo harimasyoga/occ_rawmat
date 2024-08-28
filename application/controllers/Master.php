@@ -153,9 +153,9 @@ class Master extends CI_Controller
 		}else{
 			if($priode=='all')
 			{
-				$value="where c.id_hub='$attn' ";
+				$value="where a.id_hub_occ='$attn' ";
 			}else{
-				$value="where c.id_hub='$attn' and a.date_masuk BETWEEN  '$tgl_awal' and  '$tgl_akhir'";
+				$value="where a.id_hub_occ='$attn' and a.date_masuk BETWEEN  '$tgl_awal' and  '$tgl_akhir'";
 			}
 
 		}
@@ -177,13 +177,6 @@ class Master extends CI_Controller
 			$row[] = "<div class='text-center'>".$r->date_masuk."</div>";
 			$row[] = $r->nm_hub;
 			$row[] = number_format($r->berat_bersih,0,',','.')." Kg";
-
-			// $idSales = $r->id;
-			// $cekPO = $this->db->query("SELECT COUNT(c.id_sales) AS jmlSales FROM trs_po p INNER JOIN m_pelanggan c ON p.id_pelanggan=c.id_pelanggan
-			// WHERE c.id_sales='$idSales' GROUP BY c.id_sales")->num_rows();
-			$btnEdit = '<button type="button" class="btn btn-warning btn-sm" onclick="tampil_edit('."'".$r->no_timbangan."'".','."'edit'".')"><i class="fas fa-pen"></i></button>';
-			// $row[] = ($cekPO == 0) ? $btnEdit.' '.$btnHapus : $btnEdit;
-			// $row[] = $btnEdit;
 			$data[] = $row;
 			$i++;
 		}
@@ -220,7 +213,7 @@ class Master extends CI_Controller
 
 		}
 
-		$rekap_jumlah = $this->m_master->query("SELECT *,a.jns FROM m_jembatan_timbang a JOIN m_hub b ON a.id_hub_occ=b.id_hub
+		$rekap_jumlah = $this->m_master->query("SELECT IFNULL(sum(berat_bersih),0)jumlah FROM m_jembatan_timbang a JOIN m_hub b ON a.id_hub_occ=b.id_hub
 		$value
 			ORDER BY date_masuk desc,id_timbangan DESC
 			")->row();
