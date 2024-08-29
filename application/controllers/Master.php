@@ -60,7 +60,7 @@ class Master extends CI_Controller
 
 		$data = array();
 
-		$query = $this->m_master->query("SELECT*,b.jns from invoice_bhn a
+		$query = $this->db->query("SELECT*,b.jns from invoice_bhn a
 			join m_jembatan_timbang b on a.no_timb=b.no_timbangan
 			join m_hub c on b.id_hub_occ=c.id_hub
 		$value
@@ -396,7 +396,7 @@ class Master extends CI_Controller
 		$data = array();
 
 		if ($jenis == "customer") {
-			$query = $this->m_master->query("SELECT * FROM m_customer
+			$query = $this->db->query("SELECT * FROM m_customer
 			ORDER BY id_cs")->result();
 			$i = 1;
 			foreach ($query as $r) {
@@ -429,7 +429,7 @@ class Master extends CI_Controller
 				$i++;
 			}
 		} else if ($jenis == "supplier") {
-			$query = $this->m_master->query("SELECT * FROM m_supplier
+			$query = $this->db->query("SELECT * FROM m_supplier
 			ORDER BY id_supp")->result();
 			$i = 1;
 			foreach ($query as $r) {
@@ -468,7 +468,7 @@ class Master extends CI_Controller
 			}else{
 				$where = "";
 			}
-			$query = $this->m_master->query("SELECT * FROM tb_user u $where ORDER BY u.id")->result();
+			$query = $this->db->query("SELECT * FROM tb_user u $where ORDER BY u.id")->result();
 			$i = 1;
 			foreach ($query as $r) {
 				$row = array();
@@ -497,7 +497,7 @@ class Master extends CI_Controller
 			}
 		} else if ($jenis == "user_level") {
 			
-			$query = $this->m_master->query("SELECT * FROM m_modul_group ORDER BY id_group")->result();
+			$query = $this->db->query("SELECT * FROM m_modul_group ORDER BY id_group")->result();
 			$i = 1;
 			foreach ($query as $r) {
 				$row = array();
@@ -536,7 +536,7 @@ class Master extends CI_Controller
 		$field   = $_POST['field'];
 		$id = $_POST['id'];
 
-		$result = $this->m_master->query("DELETE FROM $jenis WHERE  $field = '$id'");
+		$result = $this->db->query("DELETE FROM $jenis WHERE  $field = '$id'");
 
 		echo json_encode($result);
 	}

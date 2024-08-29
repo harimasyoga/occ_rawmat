@@ -1095,7 +1095,7 @@ join m_jembatan_timbang b on a.no_timb=b.no_timbangan
 				")->result();
 
 		} else if ($jenis == "trs_so_detail") {
-			$data =  $this->m_master->query(
+			$data =  $this->db->query(
 				"SELECT * 
                 FROM trs_so_detail a
                 JOIN m_produk b ON a.id_produk=b.id_produk
@@ -1109,7 +1109,7 @@ join m_jembatan_timbang b on a.no_timb=b.no_timbangan
 
 			$data = ["header" => $header, "detail" => $detail];
 		} else if ($jenis == "SJ") {
-			$header =  $this->m_master->query("SELECT a.*,IFNULL(qty_sj,0)qty_sj FROM trs_po_detail a 
+			$header =  $this->db->query("SELECT a.*,IFNULL(qty_sj,0)qty_sj FROM trs_po_detail a 
                                     LEFT JOIN 
                                     (
                                     SELECT no_po,kode_mc,SUM(qty) AS qty_sj FROM `trs_surat_jalan` WHERE STATUS <> 'Batal' GROUP BY no_po,kode_mc
@@ -1120,7 +1120,7 @@ join m_jembatan_timbang b on a.no_timb=b.no_timbangan
 
 			$data = ["header" => $header, "detail" => ""];
 		} else if ($jenis == "SJView") {
-			$header =  $this->m_master->query("SELECT a.*,IFNULL(qty_sj,0)qty_sj FROM trs_po_detail a 
+			$header =  $this->db->query("SELECT a.*,IFNULL(qty_sj,0)qty_sj FROM trs_po_detail a 
                                     LEFT JOIN 
                                     (
                                     SELECT no_po,kode_mc,SUM(qty) AS qty_sj FROM `trs_surat_jalan` WHERE STATUS <> 'Batal' GROUP BY no_po,kode_mc
@@ -1163,16 +1163,16 @@ join m_jembatan_timbang b on a.no_timb=b.no_timbangan
 			if($update_no_pl)
 			{
 
-				$result          = $this->m_master->query("DELETE FROM invoice_header WHERE  $field = '$id'");
+				$result          = $this->db->query("DELETE FROM invoice_header WHERE  $field = '$id'");
 
-				$result          = $this->m_master->query("DELETE FROM invoice_detail WHERE  no_invoice = '$no_inv'");
+				$result          = $this->db->query("DELETE FROM invoice_detail WHERE  no_invoice = '$no_inv'");
 			}
 			
 			
 			
 		} else {
 
-			$result = $this->m_master->query("DELETE FROM $jenis WHERE  $field = '$id'");
+			$result = $this->db->query("DELETE FROM $jenis WHERE  $field = '$id'");
 		}
 
 		echo json_encode($result);
