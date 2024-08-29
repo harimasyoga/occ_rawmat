@@ -96,7 +96,7 @@
                                     <td>
                                       <div class="mb-1 text-right" style="font-weight:bold;color:red">
                                         <!-- <input type="text" size="5" name="total_nom" id="total_nom" style="font-weight:bold;color:red" class="angka form-control text-right" value='0' readonly> -->
-                                        <span id="total_all_inv_bhn"></span>
+                                        <!-- <span id="total_all_inv_bhn"></span> -->
                                       </div>
                                       
                                     </td>	
@@ -207,7 +207,7 @@
                                     <td>
                                       <div class="mb-1 text-left" style="font-weight:bold;color:red">
                                         <!-- <input type="text" size="5" name="total_nom_timb" id="total_nom" style="font-weight:bold;color:red" class="angka form-control text-right" value='0' readonly> -->
-                                        <span id="total_all_timb_bhn"></span>
+                                        <!-- <span id="total_all_timb_bhn"></span> -->
                                       </div>
                                       
                                     </td>	
@@ -374,9 +374,9 @@
         success: function(data) {
           if(data){
             // header
-            $("#total_all_inv_bhn").html(`
-            <div> Rp${format_angka(data.rekap_jumlah.jumlah)}
-            </div>`);
+            // $("#total_all_inv_bhn").html(`
+            // <div> Rp${format_angka(data.rekap_jumlah.jumlah)}
+            // </div>`);
             swal.close();
 
           } else {
@@ -388,7 +388,7 @@
               confirmButtonText   : "OK"
             });
             return;
-            $("#total_all_inv_bhn").val(0);
+            // $("#total_all_inv_bhn").val(0);
           }
         },
         error: function(jqXHR, textStatus, errorThrown) {
@@ -457,9 +457,9 @@
         success: function(data) {
           if(data){
             // header
-            $("#total_all_timb_bhn").html(`
-            <div>${format_angka(data.rekap_jumlah.jumlah)} Kg
-            </div>`);
+            // $("#total_all_timb_bhn").html(`
+            // <div>${format_angka(data.rekap_jumlah.jumlah)} Kg
+            // </div>`);
             swal.close();
 
           } else {
@@ -471,7 +471,7 @@
               confirmButtonText   : "OK"
             });
             return;
-            $("#total_all_timb_bhn").val(0);
+            // $("#total_all_timb_bhn").val(0);
           }
         },
         error: function(jqXHR, textStatus, errorThrown) {
