@@ -122,7 +122,7 @@ class Master extends CI_Controller
 
 		}
 
-		$rekap_jumlah = $this->m_master->query("SELECT IFNULL(sum(qty*nominal),0)jumlah from invoice_bhn a
+		$rekap_jumlah = $this->db->query("SELECT IFNULL(sum(qty*nominal),0)jumlah from invoice_bhn a
 			join m_jembatan_timbang b on a.no_timb=b.no_timbangan
 			join m_hub c on b.id_hub_occ=c.id_hub
 		$value
@@ -213,7 +213,7 @@ class Master extends CI_Controller
 
 		}
 
-		$rekap_jumlah = $this->m_master->query("SELECT IFNULL(sum(berat_bersih),0)jumlah FROM m_jembatan_timbang a JOIN m_hub b ON a.id_hub_occ=b.id_hub
+		$rekap_jumlah = $this->db->query("SELECT IFNULL(sum(berat_bersih),0)jumlah FROM m_jembatan_timbang a JOIN m_hub b ON a.id_hub_occ=b.id_hub
 		$value
 			ORDER BY date_masuk desc,id_timbangan DESC
 			")->row();

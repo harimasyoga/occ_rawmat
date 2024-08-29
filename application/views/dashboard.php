@@ -436,7 +436,7 @@
           "emptyTable": "Tidak ada data.."
         }
       });
-      // total_timb_bhn();
+      total_timb_bhn();
     }
 
     function total_timb_bhn()
