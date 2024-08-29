@@ -159,7 +159,7 @@ class Logistik extends CI_Controller
 
 		if($jenis=='timbangan')
 		{
-			$queryh   = "SELECT *,a.jns FROM $tbl a JOIN m_hub b ON a.id_hub_occ=b.id_hub WHERE $field = '$id' ";
+			$queryh   = "SELECT *,a.jns,a.alamat FROM $tbl a JOIN m_hub b ON a.id_hub_occ=b.id_hub WHERE $field = '$id' ";
 			
 			$queryd   = "SELECT*FROM $tbl where $field = '$id' ";
 		}else if($jenis=='spill_timb')
