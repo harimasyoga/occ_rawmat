@@ -415,7 +415,7 @@
 					$("#penimbang").val(data.header.nm_penimbang).trigger('change');
 					$("#permintaan").val(data.header.permintaan);					
 					$("#supplier").val(data.header.suplier);					
-					$("#masuk").val(data.header.date_masuk);					
+					$("#masuk").val(data.header.date_masuk);	
 					$("#alamat").val(data.header.alamat);					
 					$("#keluar").val(data.header.date_keluar);					
 					$("#nopol").val(data.header.no_polisi);					
