@@ -130,6 +130,56 @@ class M_logistik extends CI_Model
 		
 	}
 
+	function save_inv_beli_bhn()
+	{
+		$status_input = $this->input->post('sts_input');
+		if($status_input == 'add')
+		{
+			$tgl_inv       = $this->input->post('tgl_inv');
+			$tanggal       = explode('-',$tgl_inv);
+			$tahun         = $tanggal[0];
+			$bulan         = $tanggal[1];
+			
+			$c_no_inv    = $this->m_fungsi->urut_transaksi('INV_BHN');
+			$m_no_inv    = $c_no_inv.'/INV/BHN/'.$bulan.'/'.$tahun;
+
+			$data_header = array(
+				'no_inv_bhn'    => $m_no_inv,
+				'tgl_inv_bhn'   => $this->input->post('tgl_inv'),
+				'id_hub'        => $this->input->post('hub_bhn'), 
+				'suplier'       => $this->input->post('supp'), 
+				'qty'           => str_replace('.','',$this->input->post('qty')), 
+				'nominal'       => str_replace('.','',$this->input->post('nom')),
+				'total_bayar'   => str_replace('.','',$this->input->post('total_bayar')),
+				'acc_owner'     => 'N',
+				
+			);
+
+			$result_header = $this->db->insert('invoice_beli_bhn', $data_header);
+
+			return $result_header;
+			
+		}else{
+			
+			$no_inv_bhn    = $this->input->post('no_inv_bhn');
+			$data_header = array(
+				'no_inv_bhn'    => $no_inv_bhn,
+				'tgl_inv_bhn'   => $this->input->post('tgl_inv'),
+				'id_hub'        => $this->input->post('hub_bhn'), 
+				'suplier'       => $this->input->post('supp'), 
+				'qty'           => str_replace('.','',$this->input->post('qty')), 
+				'nominal'       => str_replace('.','',$this->input->post('nom')),
+				'total_bayar'   => str_replace('.','',$this->input->post('total_bayar')),
+				'acc_owner'     => 'N',
+			);
+
+			$this->db->where('id_inv_bhn', $this->input->post('id_inv_bhn'));
+			$result_header = $this->db->update('invoice_beli_bhn', $data_header);
+			return $result_header;
+		}
+		
+	}
+
 	function verif_inv_bhn()
 	{
 		$no_inv       = $this->input->post('no_inv');

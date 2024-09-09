@@ -50,5 +50,16 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 |		my-controller/my-method	-> my_controller/my_method
 */
 $route['default_controller'] = 'Login';
-$route['404_override'] = '';
+$route['404_override'] = 'Master/erorr_page';
 $route['translate_uri_dashes'] = FALSE;
+
+
+// master
+$route['UAJLGZexEUrPqwS'] = 'Master/Supplier';
+$route['vkCwt3Vh1e5bjcn'] = 'Master/Barang';
+$route['AzR5g6bVxw87Z7u'] = 'Master/Produk';
+$route['dwGgkZhlcoAa2SV'] = 'Master/User';
+$route['sCDgLsHF3XuIQb1'] = 'Master/User_level';
+$route['s2U5dsvYdoSEYtP'] = 'Logistik/Timbangan';
+$route['HtuEB0UpZIDA5qz'] = 'Logistik/Invoice_bhn_bk';
+$route['sT0WNlw2DIaz4ck'] = 'Logistik/Beli_bahan';
