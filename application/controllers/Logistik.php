@@ -184,6 +184,18 @@ class Logistik extends CI_Controller
 			where $field = '$id'
 			order by tgl_inv_bhn desc, id_inv_bhn";
 
+		}else if($jenis=='edit_inv_beli_bhn')
+		{ 
+			$queryh   = "SELECT* from invoice_beli_bhn a
+			JOIN m_hub b on a.id_hub=b.id_hub
+			where $field = '$id'
+			order by tgl_inv_bhn desc, id_inv_bhn";
+			
+			$queryd   = "SELECT* from invoice_beli_bhn a
+			JOIN m_hub b on a.id_hub=b.id_hub
+			where $field = '$id'
+			order by tgl_inv_bhn desc, id_inv_bhn";
+
 		}else{
 			$queryh   = "SELECT*FROM $tbl where no_invoice='$id'";
 			$queryd   = "SELECT*FROM invoice_detail where no_invoice='$id' ";
@@ -390,6 +402,64 @@ class Logistik extends CI_Controller
 						<div class="text-center"><a style="text-align: center;" class="btn btn-sm '.$btn2.' " '.$urll2.' title="VERIFIKASI DATA" ><b>'.$i2.' </b> </a><span style="font-size:1px;color:transparent">'.$r->acc_owner.'</span><div>';
 
 				$btncetak ='<a target="_blank" class="btn btn-sm btn-danger" href="' . base_url("Logistik/cetak_inv_bb2?no_inv_bhn="."$r->no_inv_bhn"."") . '" title="Cetak" ><i class="fas fa-print"></i> </a>';
+
+				$btnEdit = '<a class="btn btn-sm btn-warning" onclick="edit_data(' . $id . ',' . $no_inv_bhn . ')" title="EDIT DATA" >
+				<b><i class="fa fa-edit"></i> </b></a>';
+
+				$btnHapus = '<button type="button" title="DELETE"  onclick="deleteData(' . $id . ',' . $no_inv_bhn . ')" class="btn btn-secondary btn-sm">
+				<i class="fa fa-trash-alt"></i></button> ';
+					
+				if (in_array($this->session->userdata('level'), ['Admin','User']))
+				{
+					$row[] = '<div class="text-center">'.$btnEdit.' '.$btncetak.''.$btnHapus.'</div>';
+
+				}else{
+					$row[] = '<div class="text-center">'.$btncetak.'</div>';
+				}
+				
+				$data[] = $row;
+				$i++;
+			}
+		
+		}else if ($jenis == "inv_beli_bhn") {			
+			$query = $this->db->query("SELECT* from invoice_beli_bhn a
+			JOIN m_hub b on a.id_hub=b.id_hub
+			order by tgl_inv_bhn desc, id_inv_bhn")->result();
+ 
+			$i               = 1;
+			foreach ($query as $r) {
+
+				$id           = "'$r->id_inv_bhn'";
+				$no_inv_bhn   = "'$r->no_inv_bhn'";
+
+				if($r->acc_owner=='N')
+                {
+                    $btn2   = 'btn-warning';
+                    $i2     = '<i class="fas fa-lock"></i>';
+                } else {
+                    $btn2   = 'btn-success';
+                    $i2     = '<i class="fas fa-check-circle"></i>';
+                }
+				
+				if (in_array($this->session->userdata('username'), ['owner','developer']))
+				{
+					$urll2 = "onclick=open_modal('$r->id_inv_bhn','$r->no_inv_bhn')";
+				} else {
+					$urll2 = '';
+				}
+					
+				$row    = array();
+				$row[]  = '<div class="text-center">'.$i.'</div>';
+				$row[]  = '<div class="text-center">'.$r->no_inv_bhn.'</div>';
+				$row[]  = '<div class="text-center">'.$r->aka.'</div>';
+				$row[]  = '<div class="text-center">'.$r->tgl_inv_bhn.'</div>';
+				$row[]  = '<div class="text-right">'.number_format($r->qty, 0, ",", ".").'</div>';
+				$row[]  = '<div class="text-right">'.number_format($r->nominal, 0, ",", ".").'</div>';
+				$row[]  = '<div class="text-right">'.number_format($r->qty * $r->nominal, 0, ",", ".").'</div>';
+				$row[]  = '
+						<div class="text-center"><a style="text-align: center;" class="btn btn-sm '.$btn2.' " '.$urll2.' title="VERIFIKASI DATA" ><b>'.$i2.' </b> </a><span style="font-size:1px;color:transparent">'.$r->acc_owner.'</span><div>';
+
+				$btncetak ='<a target="_blank" class="btn btn-sm btn-danger" href="' . base_url("Logistik/cetak_nota?no_inv_bhn="."$r->no_inv_bhn"."") . '" title="Cetak" ><i class="fas fa-print"></i> </a>';
 
 				$btnEdit = '<a class="btn btn-sm btn-warning" onclick="edit_data(' . $id . ',' . $no_inv_bhn . ')" title="EDIT DATA" >
 				<b><i class="fa fa-edit"></i> </b></a>';
@@ -625,6 +695,26 @@ class Logistik extends CI_Controller
 		$this->load->view('footer');
 	}
 
+	function insert_inv_beli_bhn()
+	{
+		if($this->session->userdata('username'))
+		{ 
+			$result = $this->m_logistik->save_inv_beli_bhn();
+			echo json_encode($result);
+		}
+		
+	}
+	
+	public function Beli_bahan()
+	{
+		$data = array(
+			'judul' => "Pembelian Bahan",
+		);
+		$this->load->view('header', $data);
+		$this->load->view('Logistik/v_beli_bhn');
+		$this->load->view('footer');
+	}
+
 	function prosesData()
 	{
 		$jenis    = $_POST['jenis'];
@@ -638,7 +728,7 @@ class Logistik extends CI_Controller
 		$no_inv_bhn        = $_GET['no_inv_bhn'];
  
         $query_header = $this->db->query("SELECT*,b.jns,c.alamat as alamat_hub,b.alamat from invoice_bhn a
-join m_jembatan_timbang b on a.no_timb=b.no_timbangan
+			join m_jembatan_timbang b on a.no_timb=b.no_timbangan
 			join m_hub c on b.id_hub_occ=c.id_hub
 			WHERE no_inv_bhn='$no_inv_bhn'
 			order by tgl_inv_bhn desc, id_inv_bhn"); 
@@ -646,7 +736,7 @@ join m_jembatan_timbang b on a.no_timb=b.no_timbangan
         $data = $query_header->row();
         
         $querydetail = $this->db->query("SELECT*,b.jns,c.alamat as alamat_hub,b.alamat from invoice_bhn a
-join m_jembatan_timbang b on a.no_timb=b.no_timbangan
+			join m_jembatan_timbang b on a.no_timb=b.no_timbangan
 			join m_hub c on b.id_hub_occ=c.id_hub
 			WHERE no_inv_bhn='$no_inv_bhn'
 			order by tgl_inv_bhn desc, id_inv_bhn");
@@ -878,6 +968,174 @@ join m_jembatan_timbang b on a.no_timb=b.no_timbangan
 		}
 	}
 
+	function cetak_nota()
+	{
+		$no_inv_bhn        = $_GET['no_inv_bhn'];
+ 
+        $query_header = $this->db->query("SELECT* from invoice_beli_bhn a
+			JOIN m_hub b on a.id_hub=b.id_hub
+			where no_inv_bhn='$no_inv_bhn'
+			order by tgl_inv_bhn desc, id_inv_bhn"); 
+        
+        $data = $query_header->row();
+        
+        $querydetail = $this->db->query("SELECT* from invoice_beli_bhn a
+			JOIN m_hub b on a.id_hub=b.id_hub
+			where no_inv_bhn='$no_inv_bhn'
+			order by tgl_inv_bhn desc, id_inv_bhn");
+
+		$html = '';
+
+		
+		$html   = '';
+		$top    = 5;
+		$id     = $data->no_inv_bhn;
+		if ($query_header->num_rows() > 0) 
+		{
+
+
+		$html .= '
+			<table style="border-collapse:collapse;font-family: Century Gothic; font-size:12px; color:#000;" width="100%"  border="0" cellspacing="0" cellpadding="0" align="center" >
+			 <thead>			
+
+				<tr>
+					<td rowspan="5" align="center">
+						<img src="'.base_url('assets/gambar/').$data->logo.'" width="70" height="70" />
+					</td>
+					<td>
+						<b>
+						<tr>
+							<td align="center" style="font-size:20;border-bottom: none;"><b>'.$data->nm_hub.'</b></td>
+						</tr>
+						<tr>
+							<td align="center" style="font-size:10px;">'.$data->alamat2.'  Kode Pos '.$data->kode_pos.' </td>
+						</tr>
+						<tr>
+							<td align="center" style="font-size:10px;">Wa : '.$data->no_telp.'  |  Telp : '.$data->no_telp.' </td>
+						</tr>
+						</b>
+					</td>
+				</tr>
+
+				<tr>            
+					<td style="font-size:3px;text-align:center;font-weight:bold" >&nbsp;</td>
+				</tr>
+
+				<tr>            
+					<td colspan="3" style="background-color:#000;font-size:2px;text-align:center;font-weight:bold" >&nbsp;</td>
+				</tr>
+				<tr>            
+					<td style="font-size:3px;text-align:center;font-weight:bold" >&nbsp;</td>
+				</tr>
+			</table>';
+
+		$html .= '
+			<table style="margin-bottom:16px;font-size:12px;border-collapse:collapse" border="0" width="100%">
+			
+				<tr>
+					<td width="20%" >No. Nota </td>
+					<td width="5%" >:</td>
+					<td width="75%" >'.$data->no_inv_bhn.'</td>
+				</tr>
+				<tr>
+					<td>Tanggal</td>
+					<td>:</td>
+					<td>'.$data->tgl_inv_bhn.'</td>
+				</tr>
+				<tr>
+					<td>Nama</td>
+					<td>:</td>
+					<td>'.$data->suplier.'</td>
+				</tr>
+			</table> ';
+
+		$html .= '
+			<table style="margin-bottom:16px;font-size:12px;border-collapse:collapse;" border="1" width="100%" cellspacing="1" cellpadding="1">
+			
+				<tr>
+					<td width="25%" align="center" style="background-color:#386fa4; font-weight:bold;color:#fff;" >Barang</td>
+					<td width="25%" align="center" style="background-color:#386fa4; font-weight:bold;color:#fff;" >Qty (Kg)</td>
+					<td width="25%" align="center" style="background-color:#386fa4; font-weight:bold;color:#fff;" >Harga (Rp)</td>
+					<td width="25%" align="center" style="background-color:#386fa4; font-weight:bold;color:#fff;" >Jumlah (Rp)</td>
+				</tr>
+				<tr>
+					<td align="left">KARDUS BEKAS</td>
+					<td align="center">'.number_format($data->qty, 0, ",", ".").'</td>
+					<td align="center">'.number_format($data->nominal, 0, ",", ".").'</td>
+					<td align="center">'.number_format($data->qty*$data->nominal, 0, ",", ".").'</td>
+				</tr>';
+
+			for ( $i=0;$i<8;$i++)
+			{
+			$html .= '
+				<tr> 
+					<td>&nbsp;</td>
+					<td>&nbsp;</td>
+					<td>&nbsp;</td>
+					<td>&nbsp;</td>
+				</tr>';
+			}
+			$html .= '
+				<tr>
+					<td colspan="3" style="border:none" align="right"><b>TOTAL &nbsp; Rp.</b></td>
+					<td align="right"><b>'.number_format($data->qty*$data->nominal, 0, ",", ".").'</b></td>
+				</tr>
+				<tr>
+					<td style="border:none" colspan="3" align="right"></td>
+					<td style="border-bottom:2px solid #000;border-right:none;border-left:none;font-size:1px;">&nbsp;</td>
+				</tr>';
+
+				$url= "".base_url().'assets/gambar/pil.png';
+
+				$html .= '
+				<tr>
+					<td style="border:none;" colspan="2" align="center">Hormat kami					
+					<td style="border:0;" align="right">&nbsp;</td>
+					<td style="border:0" >&nbsp;</td>
+				</tr>';
+
+				$html .= '
+				<tr>
+					<td style="border:none" colspan="4" align="center">&nbsp;</td>
+				</tr>
+				<tr>
+					<td style="border:none" colspan="4" align="center">&nbsp;</td>
+				</tr>
+				<tr>
+					<td style="border:none;border-top:1px solid #000;" colspan="2" align="center">admin pembelian</td>
+					<td style="border:none" colspan="2"></td>
+				</tr>
+			</table>
+			';
+
+
+		} else {
+			$html .= '<h1> Data Kosong </h1>';
+		}
+
+		$judul    = 'INVOICE';
+		$jdl_save = $no_inv_bhn;
+		$position = 'P';
+		$cekpdf   = '1';
+
+		switch ($cekpdf) {
+			case 0;
+				echo ("<title>$judul</title>");
+				echo ($html);
+				break;
+
+			case 1;
+			$judul = 'NOTA PEMBELIAN - '.$id;
+				$this->m_fungsi->newMpdf($judul, '-', $html, $top, 3, 3, 3, 'P', 'TT', $judul.'.pdf');
+				break;
+			case 2;
+				header("Cache-Control: no-cache, no-store, must-revalidate");
+				header("Content-Type: application/vnd-ms-excel");
+				header("Content-Disposition: attachment; filename= $judul.xls");
+				$this->load->view('app/master_cetak', $data);
+				break;
+		}
+	}
 	
 	function load_hub()
     {
@@ -1143,8 +1401,7 @@ join m_jembatan_timbang b on a.no_timb=b.no_timbangan
 		$id       = $_POST['id'];
 
 		if ($jenis == "invoice") {
-			$no_inv          = $_POST['no_inv'];
-			
+			$no_inv          = $_POST['no_inv'];			
 			// ubah no pl
 			$query_cek = $this->db->query("SELECT*FROM invoice_detail where no_invoice ='$no_inv'")->result();
 
