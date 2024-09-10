@@ -328,7 +328,7 @@ class Logistik extends CI_Controller
 		}else if ($jenis == "search_timbangan") {			
 			$query = $this->db->query("SELECT * FROM m_jembatan_timbang 
 			where no_timbangan not in (select no_timb from invoice_bhn) 
-			ORDER BY id_timbangan")->result();
+			ORDER BY date_masuk,id_timbangan")->result();
 
 			$i = 1;
 			foreach ($query as $r) {
