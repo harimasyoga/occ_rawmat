@@ -77,23 +77,14 @@
 					<br>
 					<div class="card-body row" style="padding-bottom:1px;font-weight:bold">			
 						<div class="col-md-2">No Invoice</div>
-						<div class="col-md-9">
+						<div class="col-md-3">
 							<input type="hidden" name="sts_input" id="sts_input">
-							<input type="hidden" name="pilihan" id="pilihan" value="BAHAN">
+							<input type="hidden" name="pilihan" id="pilihan" value="UMUM">
 							<input type="hidden" name="id_inv_bhn" id="id_inv_bhn">
 
 							<input type="text" class="angka form-control" name="no_inv_bhn" id="no_inv_bhn" value="AUTO" readonly>
 						</div>
-						<!-- <div class="col-md-1"></div> -->
-					</div>
-					<div class="card-body row" style="padding-bottom:1px;font-weight:bold">			
-						<div class="col-md-2">Jenis Box</div>
-						<div class="col-md-3">
-							<select id="jenis" name="jenis" class="form-control select2" style="width: 100%" >
-								<option value="KARDUS">KARDUS</option>
-								<option value="DUPLEX">DUPLEX</option>
-							</select>
-						</div>
+						
 						<div class="col-md-1"></div>
 						<div class="col-md-2">HUB</div>
 						<div class="col-md-3">
@@ -103,11 +94,12 @@
 						</div>
 					</div>
 
-					<div class="card-body row" style="padding-bottom:1px;font-weight:bold">						
+					<div class="card-body row" style="padding-bottom:1px;font-weight:bold">		
 						<div class="col-md-2">Tanggal Invoice</div>
 						<div class="col-md-3">
 							<input type="date" class="form-control" name="tgl_inv" id="tgl_inv" value ="<?= date('Y-m-d') ?>" >
 						</div>
+						
 						<div class="col-md-1"></div>
 						<div class="col-md-2">Qty</div>
 						<div class="col-md-3">
@@ -124,12 +116,10 @@
 					</div>
 					
 					<div class="card-body row" style="padding-bottom:1px;font-weight:bold">
-						<div class="col-md-2">Supplier</div>
+						<div class="col-md-2">Jenis</div>
 						<div class="col-md-3">
-							<div class="input-group mb-1">
-								<input type="text" class="form-control" name="supp" id="supp" >
-							</div>
-						</div>	
+							<input type="text" class="form-control" name="jenis" id="jenis" oninput="this.value = this.value.toUpperCase()">
+						</div>
 						<div class="col-md-1"></div>	
 						<div class="col-md-2">Harga</div>
 						<div class="col-md-3">
@@ -141,17 +131,14 @@
 								<input type="text" class="angka form-control" name="nom" id="nom"  onkeyup="ubah_angka(this.value,this.id),hitung_total()">
 									
 							</div>
-						</div>		
-						
+						</div>
 					</div>
 					
 					<div class="card-body row" style="padding-bottom:1px;font-weight:bold">
-						<div class="col-md-2">Plat Nomor</div>
+						<div class="col-md-2">Keterangan</div>
 						<div class="col-md-3">
-							<div class="input-group mb-1">
-								<input type="text" class="form-control" name="plat" id="plat" >
-							</div>
-						</div>		
+							<textarea name="ket" id="ket" class="form-control" value="-" placeholder="-" ></textarea>
+						</div>
 						<div class="col-md-1"></div>
 						<div class="col-md-2">Total Bayar</div>
 						<div class="col-md-3">
@@ -165,7 +152,6 @@
 							</div>
 						</div>
 					</div>
-					
 					<hr>
 
 					<br>
@@ -203,6 +189,7 @@
 		kosong()
 		load_data()
 		load_hub()
+		load_jenis()
 		$('.select2').select2();
 	});
 	
@@ -245,7 +232,7 @@
 			}
 		});
 	}
-	
+
 	function hitung_total()
 	{
 		var qty           = $("#qty").val()
@@ -278,7 +265,7 @@
 			"pageLength": true,
 			"paging": true,
 			"ajax": {
-				"url": '<?php echo base_url('Logistik/load_data/inv_beli_bhn')?>',
+				"url": '<?php echo base_url('Logistik/load_data/inv_beli_umum')?>',
 				"type": "POST",
 			},
 			"aLengthMenu": [
@@ -326,9 +313,8 @@
 					$("#tgl_inv").val(data.header.tgl_inv_bhn);
 					$("#qty").val(format_angka(data.header.qty));
 					$("#nom").val(format_angka(data.header.nominal));
-					$("#supp").val(data.header.suplier);
-					$("#jenis").val(data.header.jenis).trigger('change');
-					$("#plat").val(data.header.plat);
+					$("#jenis").val(data.header.jenis);
+					$("#ket").val(data.header.ket);
 					var total = data.header.qty*data.header.nominal
 					$("#total_bayar").val(format_angka(total));	
 
@@ -363,79 +349,6 @@
 		});
 	}
 
-	// MODAL //
-	function open_modal(id,no_inv_bhn) 
-	{		
-		$("#modalForm").modal("show");
-		$("#judul").html('<h3> VERIFIKASI OWNER </h3>');
-		
-		$.ajax({
-			url        : '<?= base_url(); ?>Logistik/load_data_1',
-			type       : "POST",
-			data       : { id : no_inv_bhn, tbl:'invoice_bhn', jenis :'edit_inv_bhn',field :'no_inv_bhn' },
-			dataType   : "JSON",
-			beforeSend: function() {
-				swal({
-				title: 'loading data...',
-				allowEscapeKey    : false,
-				allowOutsideClick : false,
-				onOpen: () => {
-					swal.showLoading();
-				}
-				})
-			},
-
-			success: function(data) {
-				if(data){
-					// header
-					$("#m_no_inv_bhn").val(data.header.no_inv_bhn);
-					$("#m_no_timbangan").val(data.header.no_timb);
-					$("#m_tgl_inv").val(data.header.tgl_inv_bhn);
-					$("#m_qty").val(format_angka(data.header.qty));
-					$("#m_nom").val(format_angka(data.header.nominal));
-					var total = data.header.qty*data.header.nominal
-					$("#m_total_bayar").val(format_angka(total));	
-
-					if(data.header.acc_owner == 'Y')
-					{
-						$("#modal_btn_verif").html(`<button type="button" class="btn btn-success" id="modal_btn_verif" onclick="acc_inv('Y')"><i class="fas fa-lock"></i><b> BATAL VERIFIKASI </b></button>`)
-					}else{
-						$("#modal_btn_verif").html(`<button type="button" class="btn btn-success" id="modal_btn_verif" onclick="acc_inv('N')"><i class="fas fa-check"></i><b> VERIFIKASI </b></button>`)
-
-					}
-
-										
-					swal.close();
-					hitung_total()	
-
-				} else {
-
-					swal.close();
-					swal({
-						title               : "Cek Kembali",
-						html                : "Gagal Simpan",
-						type                : "error",
-						confirmButtonText   : "OK"
-					});
-					return;
-				}
-			},
-			error: function(jqXHR, textStatus, errorThrown) {
-				// toastr.error('Terjadi Kesalahan');
-				
-				swal.close();
-				swal({
-					title               : "Cek Kembali",
-					html                : "Terjadi Kesalahan",
-					type                : "error",
-					confirmButtonText   : "OK"
-				});
-				
-				return;
-			}
-		});
-
-	}
 
 	function acc_inv(acc_owner) 
 	{	
@@ -533,11 +446,10 @@
 	{
 		var tgl = '<?= date('Y-m-d') ?>'	
 		$("#id_inv_bhn").val('');
+		$("#ket").val('');
 		$("#no_inv_bhn").val('AUTO');			
 		$("#nom").val(format_angka(0));						
 		$("#qty").val(format_angka(0));
-		$("#supp").val('');
-		$("#plat").val('');
 		$("#tgl_inv").val(tgl);
 		$("#hub_bhn").val('').trigger('change');
 		hitung_total()		
@@ -549,11 +461,10 @@
 		var id_stok_d   = $("#id_stok_d").val();
 		var nom         = $("#nom").val();
 		var total_bayar = $("#total_bayar").val();
-		var plat        = $("#plat").val();
 		var jenis       = $("#jenis").val();
 		var hub_bhn     = $("#hub_bhn").val();
 		
-		if ( id_stok_d == '' || nom== '' || total_bayar == '' || total_bayar == 0 || plat == '' || jenis == '' || hub_bhn=='' ) 
+		if ( id_stok_d == '' || nom== '' || total_bayar == '' || total_bayar == 0 || jenis == '' || hub_bhn=='' ) 
 		{
 			swal({
 				title               : "Cek Kembali",

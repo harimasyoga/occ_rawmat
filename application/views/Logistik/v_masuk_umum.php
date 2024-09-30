@@ -44,8 +44,6 @@
 									<th class="text-center">NO INVOICE</th>
 									<th class="text-center">HUB</th>
 									<th class="text-center">TANGGAL</th>
-									<th class="text-center">QTY (Kg)</th>
-									<th class="text-center">HARGA (Rp)</th>
 									<th class="text-center">TOTAL (Rp)</th>
 									<th class="text-center">ACC OWNER</th>
 									<th class="text-center">AKSI</th>
@@ -77,92 +75,52 @@
 					<br>
 					<div class="card-body row" style="padding-bottom:1px;font-weight:bold">			
 						<div class="col-md-2">No Invoice</div>
-						<div class="col-md-9">
-							<input type="hidden" name="sts_input" id="sts_input">
-							<input type="hidden" name="pilihan" id="pilihan" value="BAHAN">
-							<input type="hidden" name="id_inv_bhn" id="id_inv_bhn">
-
-							<input type="text" class="angka form-control" name="no_inv_bhn" id="no_inv_bhn" value="AUTO" readonly>
-						</div>
-						<!-- <div class="col-md-1"></div> -->
-					</div>
-					<div class="card-body row" style="padding-bottom:1px;font-weight:bold">			
-						<div class="col-md-2">Jenis Box</div>
 						<div class="col-md-3">
-							<select id="jenis" name="jenis" class="form-control select2" style="width: 100%" >
-								<option value="KARDUS">KARDUS</option>
-								<option value="DUPLEX">DUPLEX</option>
-							</select>
+							<input type="hidden" name="sts_input" id="sts_input">
+							<input type="hidden" name="id_inv_masuk" id="id_inv_masuk">
+
+							<input type="text" class="angka form-control" name="no_inv_masuk" id="no_inv_masuk" value="AUTO" readonly>
 						</div>
+						
 						<div class="col-md-1"></div>
 						<div class="col-md-2">HUB</div>
 						<div class="col-md-3">
-							<select id="hub_bhn" name="hub_bhn" class="form-control select2" style="width: 100%" >
+							<select id="hub_masuk" name="hub_masuk" class="form-control select2" style="width: 100%" >
 							</select>
 
 						</div>
 					</div>
 
-					<div class="card-body row" style="padding-bottom:1px;font-weight:bold">						
+					<div class="card-body row" style="padding-bottom:1px;font-weight:bold">		
 						<div class="col-md-2">Tanggal Invoice</div>
 						<div class="col-md-3">
 							<input type="date" class="form-control" name="tgl_inv" id="tgl_inv" value ="<?= date('Y-m-d') ?>" >
 						</div>
-						<div class="col-md-1"></div>
-						<div class="col-md-2">Qty</div>
-						<div class="col-md-3">
-							<div class="input-group mb-1">
-								<input type="text" class="angka form-control" name="qty" id="qty"  onkeyup="ubah_angka(this.value,this.id),hitung_total()" >
-								<div class="input-group-append">
-									<span class="input-group-text"><b>Kg</b>
-									</span>
-								</div>	
-									
-							</div>
-						</div>	
-
-					</div>
-					
-					<div class="card-body row" style="padding-bottom:1px;font-weight:bold">
-						<div class="col-md-2">Supplier</div>
-						<div class="col-md-3">
-							<div class="input-group mb-1">
-								<input type="text" class="form-control" name="supp" id="supp" >
-							</div>
-						</div>	
-						<div class="col-md-1"></div>	
-						<div class="col-md-2">Harga</div>
-						<div class="col-md-3">
-							<div class="input-group mb-1">
-								<div class="input-group-append">
-									<span class="input-group-text"><b>Rp</b>
-									</span>
-								</div>	
-								<input type="text" class="angka form-control" name="nom" id="nom"  onkeyup="ubah_angka(this.value,this.id),hitung_total()">
-									
-							</div>
-						</div>		
 						
-					</div>
-					
-					<div class="card-body row" style="padding-bottom:1px;font-weight:bold">
-						<div class="col-md-2">Plat Nomor</div>
-						<div class="col-md-3">
-							<div class="input-group mb-1">
-								<input type="text" class="form-control" name="plat" id="plat" >
-							</div>
-						</div>		
 						<div class="col-md-1"></div>
-						<div class="col-md-2">Total Bayar</div>
+
+						<div class="col-md-2">Total Masuk</div>
 						<div class="col-md-3">
 							<div class="input-group mb-1">
 								<div class="input-group-append">
 									<span class="input-group-text"><b>Rp</b>
 									</span>
 								</div>	
-								<input type="text" class="angka form-control" name="total_bayar" id="total_bayar"  readonly>
+								<input type="text" class="angka form-control" name="nom" id="nom"  onkeyup="ubah_angka(this.value,this.id)">
 									
 							</div>
+						</div>
+					</div>
+					
+					<div class="card-body row" style="padding-bottom:1px;font-weight:bold">
+						<div class="col-md-2">DARI</div>
+						<div class="col-md-3">
+							<input type="text" class="form-control" name="dari" id="dari" oninput="this.value = this.value.toUpperCase()" value="Agus Antonius">
+						</div>
+						<div class="col-md-1"></div>	
+						<div class="col-md-2">Keterangan</div>
+						<div class="col-md-3">
+							<textarea name="ket" id="ket" class="form-control" value="-" placeholder="-" ></textarea>
 						</div>
 					</div>
 					
@@ -235,33 +193,17 @@
 
 					});
 
-					$('#hub_bhn').html(option);
+					$('#hub_masuk').html(option);
 					swal.close();
 				}else{	
 					option += "<option value=''></option>";			
-					$('#hub_bhn').html(option);					
+					$('#hub_masuk').html(option);					
 					swal.close();
 				}
 			}
 		});
 	}
-	
-	function hitung_total()
-	{
-		var qty           = $("#qty").val()
-		var nom           = $("#nom").val()
-		var total_bayar   = $("#total_bayar").val()
 
-		nom_ok            = (nom=='' || nom == null) ? '0' : nom;
-		var nom_total     = parseInt(nom_ok.split('.').join(''))
-		
-		qty_ok            = (qty=='' || qty == null) ? '0' : qty;
-		var qty_total     = parseInt(qty_ok.split('.').join(''))
-		
-		var total_nominal = nom_total*qty_total
-
-		$("#total_bayar").val(format_angka(total_nominal))	
-	}
 	
 	function reloadTable() 
 	{
@@ -278,7 +220,7 @@
 			"pageLength": true,
 			"paging": true,
 			"ajax": {
-				"url": '<?php echo base_url('Logistik/load_data/inv_beli_bhn')?>',
+				"url": '<?php echo base_url('Logistik/load_data/inv_masuk_umum')?>',
 				"type": "POST",
 			},
 			"aLengthMenu": [
@@ -293,7 +235,7 @@
 		})
 	}
 	
-	function edit_data(id,no_inv_bhn)
+	function edit_data(id,no_inv_masuk)
 	{
 		$(".row-input").attr('style', '');
 		$(".row-list").attr('style', 'display:none');
@@ -305,7 +247,7 @@
 		$.ajax({
 			url        : '<?= base_url(); ?>Logistik/load_data_1',
 			type       : "POST",
-			data       : { id : no_inv_bhn, tbl:'invoice_beli_bhn', jenis :'edit_inv_beli_bhn',field :'no_inv_bhn'  },
+			data       : { id : no_inv_masuk, tbl:'invoice_masuk_umum', jenis :'edit_inv_masuk_bhn',field :'no_inv_masuk'  },
 			dataType   : "JSON",
 			beforeSend: function() {
 				swal({
@@ -320,20 +262,13 @@
 			success: function(data) {
 				if(data){
 					// header 
-					$("#id_inv_bhn").val(data.header.id_inv_bhn);
-					$("#no_inv_bhn").val(data.header.no_inv_bhn);
-					$("#hub_bhn").val(data.header.id_hub).trigger('change');
-					$("#tgl_inv").val(data.header.tgl_inv_bhn);
-					$("#qty").val(format_angka(data.header.qty));
+					$("#id_inv_masuk").val(data.header.id_inv_masuk);
+					$("#no_inv_masuk").val(data.header.no_inv_masuk);
+					$("#hub_masuk").val(data.header.id_hub).trigger('change');
+					$("#tgl_inv").val(data.header.tgl_inv_masuk);
 					$("#nom").val(format_angka(data.header.nominal));
-					$("#supp").val(data.header.suplier);
-					$("#jenis").val(data.header.jenis).trigger('change');
-					$("#plat").val(data.header.plat);
-					var total = data.header.qty*data.header.nominal
-					$("#total_bayar").val(format_angka(total));	
-
+					$("#ket").val(data.header.ket);
 					swal.close();
-					hitung_total()	
 
 				} else {
 
@@ -363,79 +298,6 @@
 		});
 	}
 
-	// MODAL //
-	function open_modal(id,no_inv_bhn) 
-	{		
-		$("#modalForm").modal("show");
-		$("#judul").html('<h3> VERIFIKASI OWNER </h3>');
-		
-		$.ajax({
-			url        : '<?= base_url(); ?>Logistik/load_data_1',
-			type       : "POST",
-			data       : { id : no_inv_bhn, tbl:'invoice_bhn', jenis :'edit_inv_bhn',field :'no_inv_bhn' },
-			dataType   : "JSON",
-			beforeSend: function() {
-				swal({
-				title: 'loading data...',
-				allowEscapeKey    : false,
-				allowOutsideClick : false,
-				onOpen: () => {
-					swal.showLoading();
-				}
-				})
-			},
-
-			success: function(data) {
-				if(data){
-					// header
-					$("#m_no_inv_bhn").val(data.header.no_inv_bhn);
-					$("#m_no_timbangan").val(data.header.no_timb);
-					$("#m_tgl_inv").val(data.header.tgl_inv_bhn);
-					$("#m_qty").val(format_angka(data.header.qty));
-					$("#m_nom").val(format_angka(data.header.nominal));
-					var total = data.header.qty*data.header.nominal
-					$("#m_total_bayar").val(format_angka(total));	
-
-					if(data.header.acc_owner == 'Y')
-					{
-						$("#modal_btn_verif").html(`<button type="button" class="btn btn-success" id="modal_btn_verif" onclick="acc_inv('Y')"><i class="fas fa-lock"></i><b> BATAL VERIFIKASI </b></button>`)
-					}else{
-						$("#modal_btn_verif").html(`<button type="button" class="btn btn-success" id="modal_btn_verif" onclick="acc_inv('N')"><i class="fas fa-check"></i><b> VERIFIKASI </b></button>`)
-
-					}
-
-										
-					swal.close();
-					hitung_total()	
-
-				} else {
-
-					swal.close();
-					swal({
-						title               : "Cek Kembali",
-						html                : "Gagal Simpan",
-						type                : "error",
-						confirmButtonText   : "OK"
-					});
-					return;
-				}
-			},
-			error: function(jqXHR, textStatus, errorThrown) {
-				// toastr.error('Terjadi Kesalahan');
-				
-				swal.close();
-				swal({
-					title               : "Cek Kembali",
-					html                : "Terjadi Kesalahan",
-					type                : "error",
-					confirmButtonText   : "OK"
-				});
-				
-				return;
-			}
-		});
-
-	}
 
 	function acc_inv(acc_owner) 
 	{	
@@ -532,15 +394,12 @@
 	function kosong()
 	{
 		var tgl = '<?= date('Y-m-d') ?>'	
-		$("#id_inv_bhn").val('');
-		$("#no_inv_bhn").val('AUTO');			
+		$("#id_inv_masuk").val('');
+		$("#no_inv_masuk").val('AUTO');			
 		$("#nom").val(format_angka(0));						
 		$("#qty").val(format_angka(0));
-		$("#supp").val('');
-		$("#plat").val('');
 		$("#tgl_inv").val(tgl);
-		$("#hub_bhn").val('').trigger('change');
-		hitung_total()		
+		$("#hub_masuk").val('').trigger('change');
 		swal.close()
 	}
 
@@ -548,12 +407,10 @@
 	{
 		var id_stok_d   = $("#id_stok_d").val();
 		var nom         = $("#nom").val();
-		var total_bayar = $("#total_bayar").val();
-		var plat        = $("#plat").val();
 		var jenis       = $("#jenis").val();
-		var hub_bhn     = $("#hub_bhn").val();
+		var hub_masuk     = $("#hub_masuk").val();
 		
-		if ( id_stok_d == '' || nom== '' || total_bayar == '' || total_bayar == 0 || plat == '' || jenis == '' || hub_bhn=='' ) 
+		if ( id_stok_d == '' || nom== '' || jenis == '' || hub_masuk=='' ) 
 		{
 			swal({
 				title               : "Cek Kembali",
@@ -565,7 +422,7 @@
 		}
 
 		$.ajax({
-			url        : '<?= base_url(); ?>Logistik/insert_inv_beli_bhn',
+			url        : '<?= base_url(); ?>Logistik/insert_inv_masuk',
 			type       : "POST",
 			data       : $('#myForm').serialize(),
 			dataType   : "JSON",
@@ -639,13 +496,13 @@
 		$(".row-list").attr('style', '')
 	}
 
-	function deleteData(id,no_inv_bhn) 
+	function deleteData(id,no_inv_masuk) 
 	{
 		// let cek = confirm("Apakah Anda Yakin?");
 		swal({
 			title: "HAPUS PEMBAYARAN",
 			html: "<p> Apakah Anda yakin ingin menghapus file ini ?</p><br>"
-			+"<strong>" +no_inv_bhn+ " </strong> ",
+			+"<strong>" +no_inv_masuk+ " </strong> ",
 			type               : "question",
 			showCancelButton   : true,
 			confirmButtonText  : '<b>Hapus</b>',
@@ -659,9 +516,9 @@
 			$.ajax({
 				url: '<?= base_url(); ?>Logistik/hapus',
 				data: ({
-					id         : no_inv_bhn,
-					jenis      : 'invoice_beli_bhn',
-					field      : 'no_inv_bhn'
+					id         : no_inv_masuk,
+					jenis      : 'invoice_beli_masuk',
+					field      : 'no_inv_masuk'
 				}),
 				type: "POST",
 				beforeSend: function() {

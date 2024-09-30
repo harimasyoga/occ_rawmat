@@ -63,3 +63,5 @@ $route['sCDgLsHF3XuIQb1'] = 'Master/User_level';
 $route['s2U5dsvYdoSEYtP'] = 'Logistik/Timbangan';
 $route['HtuEB0UpZIDA5qz'] = 'Logistik/Invoice_bhn_bk';
 $route['sT0WNlw2DIaz4ck'] = 'Logistik/Beli_bahan';
+$route['LveUIFM06lsIYZm'] = 'Logistik/Beli_umum';
+$route['3jdYad3GdALqbGz'] = 'Logistik/Masuk_umum';
