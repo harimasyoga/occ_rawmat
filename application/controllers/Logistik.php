@@ -196,6 +196,18 @@ class Logistik extends CI_Controller
 			where $field = '$id'
 			order by tgl_inv_bhn desc, id_inv_bhn";
 
+		}else if($jenis=='edit_inv_masuk_bhn')
+		{ 
+			$queryh   = "SELECT* from invoice_masuk_umum a
+			JOIN m_hub b on a.id_hub=b.id_hub
+			where $field = '$id'
+			order by tgl_inv_masuk desc, id_inv_masuk";
+			
+			$queryd   = "SELECT* from invoice_masuk_umum a
+			JOIN m_hub b on a.id_hub=b.id_hub
+			where $field = '$id'
+			order by tgl_inv_masuk desc, id_inv_masuk";
+
 		}else{
 			$queryh   = "SELECT*FROM $tbl where no_invoice='$id'";
 			$queryd   = "SELECT*FROM invoice_detail where no_invoice='$id' ";
@@ -423,7 +435,7 @@ class Logistik extends CI_Controller
 		
 		}else if ($jenis == "inv_beli_bhn") {			
 			$query = $this->db->query("SELECT* from invoice_beli_bhn a
-			JOIN m_hub b on a.id_hub=b.id_hub
+			JOIN m_hub b on a.id_hub=b.id_hub WHERE pilihan ='BAHAN'
 			order by tgl_inv_bhn desc, id_inv_bhn")->result();
  
 			$i               = 1;
@@ -450,7 +462,19 @@ class Logistik extends CI_Controller
 					
 				$row    = array();
 				$row[]  = '<div class="text-center">'.$i.'</div>';
-				$row[]  = '<div class="text-center">'.$r->no_inv_bhn.'</div>';
+				$row[]  = '
+				<table>
+					<tr style="background-color: transparent !important">
+						<td style="padding : 2px;border:none;"><b>No Inv </td>
+						<td style="padding : 2px;border:none;">:</td></b> 
+						<td style="padding : 2px;border:none;">'.$r->no_inv_bhn .'<br></td>
+					</tr>
+					<tr style="background-color: transparent !important">
+						<td style="padding : 2px;border:none;"><b>Supplier </td>
+						<td style="padding : 2px;border:none;">:</td></b> 
+						<td style="padding : 2px;border:none;">'.$r->suplier .' - '.$r->plat .'<br></td>
+					</tr>
+				</table>';
 				$row[]  = '<div class="text-center">'.$r->aka.'</div>';
 				$row[]  = '<div class="text-center">'.$r->tgl_inv_bhn.'</div>';
 				$row[]  = '<div class="text-right">'.number_format($r->qty, 0, ",", ".").'</div>';
@@ -465,6 +489,132 @@ class Logistik extends CI_Controller
 				<b><i class="fa fa-edit"></i> </b></a>';
 
 				$btnHapus = '<button type="button" title="DELETE"  onclick="deleteData(' . $id . ',' . $no_inv_bhn . ')" class="btn btn-secondary btn-sm">
+				<i class="fa fa-trash-alt"></i></button> ';
+					
+				if (in_array($this->session->userdata('level'), ['Admin','User']))
+				{
+					$row[] = '<div class="text-center">'.$btnEdit.' '.$btncetak.''.$btnHapus.'</div>';
+
+				}else{
+					$row[] = '<div class="text-center">'.$btncetak.'</div>';
+				}
+				
+				$data[] = $row;
+				$i++;
+			}
+		
+		}else if ($jenis == "inv_beli_umum") {			
+			$query = $this->db->query("SELECT* from invoice_beli_bhn a
+			JOIN m_hub b on a.id_hub=b.id_hub WHERE pilihan ='UMUM'
+			order by tgl_inv_bhn desc, id_inv_bhn")->result();
+ 
+			$i               = 1;
+			foreach ($query as $r) {
+
+				$id           = "'$r->id_inv_bhn'";
+				$no_inv_bhn   = "'$r->no_inv_bhn'";
+
+				if($r->acc_owner=='N')
+                {
+                    $btn2   = 'btn-warning';
+                    $i2     = '<i class="fas fa-lock"></i>';
+                } else {
+                    $btn2   = 'btn-success';
+                    $i2     = '<i class="fas fa-check-circle"></i>';
+                }
+				
+				if (in_array($this->session->userdata('username'), ['owner','developer']))
+				{
+					$urll2 = "onclick=open_modal('$r->id_inv_bhn','$r->no_inv_bhn')";
+				} else {
+					$urll2 = '';
+				}
+					
+				$row    = array();
+				$row[]  = '<div class="text-center">'.$i.'</div>';
+				$row[]  = '
+				<table>
+					<tr style="background-color: transparent !important">
+						<td style="padding : 2px;border:none;"><b>No Inv </td>
+						<td style="padding : 2px;border:none;">:</td></b> 
+						<td style="padding : 2px;border:none;">'.$r->no_inv_bhn .'<br></td>
+					</tr>
+					<tr style="background-color: transparent !important">
+						<td style="padding : 2px;border:none;"><b>Supplier </td>
+						<td style="padding : 2px;border:none;">:</td></b> 
+						<td style="padding : 2px;border:none;">'.$r->suplier .' - '.$r->plat .'<br></td>
+					</tr>
+				</table>';
+				$row[]  = '<div class="text-center">'.$r->aka.'</div>';
+				$row[]  = '<div class="text-center">'.$r->tgl_inv_bhn.'</div>';
+				$row[]  = '<div class="text-right">'.number_format($r->qty, 0, ",", ".").'</div>';
+				$row[]  = '<div class="text-right">'.number_format($r->nominal, 0, ",", ".").'</div>';
+				$row[]  = '<div class="text-right">'.number_format($r->qty * $r->nominal, 0, ",", ".").'</div>';
+				$row[]  = '
+						<div class="text-center"><a style="text-align: center;" class="btn btn-sm '.$btn2.' " '.$urll2.' title="VERIFIKASI DATA" ><b>'.$i2.' </b> </a><span style="font-size:1px;color:transparent">'.$r->acc_owner.'</span><div>';
+
+				$btncetak ='<a target="_blank" class="btn btn-sm btn-danger" href="' . base_url("Logistik/cetak_nota?no_inv_bhn="."$r->no_inv_bhn"."") . '" title="Cetak" ><i class="fas fa-print"></i> </a>';
+
+				$btnEdit = '<a class="btn btn-sm btn-warning" onclick="edit_data(' . $id . ',' . $no_inv_bhn . ')" title="EDIT DATA" >
+				<b><i class="fa fa-edit"></i> </b></a>';
+
+				$btnHapus = '<button type="button" title="DELETE"  onclick="deleteData(' . $id . ',' . $no_inv_bhn . ')" class="btn btn-secondary btn-sm">
+				<i class="fa fa-trash-alt"></i></button> ';
+					
+				if (in_array($this->session->userdata('level'), ['Admin','User']))
+				{
+					$row[] = '<div class="text-center">'.$btnEdit.' '.$btncetak.''.$btnHapus.'</div>';
+
+				}else{
+					$row[] = '<div class="text-center">'.$btncetak.'</div>';
+				}
+				
+				$data[] = $row;
+				$i++;
+			}
+		
+		}else if ($jenis == "inv_masuk_umum") {			
+			$query = $this->db->query("SELECT* from invoice_masuk_umum a
+			JOIN m_hub b on a.id_hub=b.id_hub
+			order by tgl_inv_masuk desc, id_inv_masuk")->result();
+ 
+			$i               = 1;
+			foreach ($query as $r) {
+
+				$id           = "'$r->id_inv_masuk'";
+				$no_inv_masuk   = "'$r->no_inv_masuk'";
+
+				if($r->acc_owner=='N')
+                {
+                    $btn2   = 'btn-warning';
+                    $i2     = '<i class="fas fa-lock"></i>';
+                } else {
+                    $btn2   = 'btn-success';
+                    $i2     = '<i class="fas fa-check-circle"></i>';
+                }
+				
+				if (in_array($this->session->userdata('username'), ['owner','developer']))
+				{
+					$urll2 = "onclick=open_modal('$r->id_inv_masuk','$r->no_inv_masuk')";
+				} else {
+					$urll2 = '';
+				}
+					
+				$row    = array();
+				$row[]  = '<div class="text-center">'.$i.'</div>';
+				$row[]  = '<div class="text-center">'.$r->no_inv_masuk.'</div>';
+				$row[]  = '<div class="text-center">'.$r->aka.'</div>';
+				$row[]  = '<div class="text-center">'.$r->tgl_inv_masuk.'</div>';
+				$row[]  = '<div class="text-right">'.number_format($r->nominal, 0, ",", ".").'</div>';
+				$row[]  = '
+						<div class="text-center"><a style="text-align: center;" class="btn btn-sm '.$btn2.' " '.$urll2.' title="VERIFIKASI DATA" ><b>'.$i2.' </b> </a><span style="font-size:1px;color:transparent">'.$r->acc_owner.'</span><div>';
+
+				$btncetak ='<a target="_blank" class="btn btn-sm btn-danger" href="' . base_url("Logistik/cetak_nota?no_inv_masuk="."$r->no_inv_masuk"."") . '" title="Cetak" ><i class="fas fa-print"></i> </a>';
+
+				$btnEdit = '<a class="btn btn-sm btn-warning" onclick="edit_data(' . $id . ',' . $no_inv_masuk . ')" title="EDIT DATA" >
+				<b><i class="fa fa-edit"></i> </b></a>';
+
+				$btnHapus = '<button type="button" title="DELETE"  onclick="deleteData(' . $id . ',' . $no_inv_masuk . ')" class="btn btn-secondary btn-sm">
 				<i class="fa fa-trash-alt"></i></button> ';
 					
 				if (in_array($this->session->userdata('level'), ['Admin','User']))
@@ -705,6 +855,16 @@ class Logistik extends CI_Controller
 		
 	}
 	
+	function insert_inv_masuk()
+	{
+		if($this->session->userdata('username'))
+		{ 
+			$result = $this->m_logistik->save_inv_masuk();
+			echo json_encode($result);
+		}
+		
+	}
+	
 	public function Beli_bahan()
 	{
 		$data = array(
@@ -712,6 +872,26 @@ class Logistik extends CI_Controller
 		);
 		$this->load->view('header', $data);
 		$this->load->view('Logistik/v_beli_bhn');
+		$this->load->view('footer');
+	}
+	
+	public function Beli_umum()
+	{
+		$data = array(
+			'judul' => "Pembelian Umum",
+		);
+		$this->load->view('header', $data);
+		$this->load->view('Logistik/v_beli_umum');
+		$this->load->view('footer');
+	}
+	
+	public function Masuk_umum()
+	{
+		$data = array(
+			'judul' => "Pemasukan Umum",
+		);
+		$this->load->view('header', $data);
+		$this->load->view('Logistik/v_masuk_umum');
 		$this->load->view('footer');
 	}
 

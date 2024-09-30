@@ -136,22 +136,34 @@ class M_logistik extends CI_Model
 		if($status_input == 'add')
 		{
 			$tgl_inv       = $this->input->post('tgl_inv');
+			$pilihan       = $this->input->post('pilihan');
 			$tanggal       = explode('-',$tgl_inv);
 			$tahun         = $tanggal[0];
 			$bulan         = $tanggal[1];
 			
-			$c_no_inv    = $this->m_fungsi->urut_transaksi('INV_BHN');
-			$m_no_inv    = $c_no_inv.'/INV/BHN/'.$bulan.'/'.$tahun;
+			if($pilihan=='UMUM')
+			{
+				$c_no_inv    = $this->m_fungsi->urut_transaksi('INV_UMUM');
+				$m_no_inv    = $c_no_inv.'/INV/UMUM/'.$bulan.'/'.$tahun;
+			}else{
+				$c_no_inv    = $this->m_fungsi->urut_transaksi('INV_BHN');
+				$m_no_inv    = $c_no_inv.'/INV/BHN/'.$bulan.'/'.$tahun;
+			}
 
 			$data_header = array(
 				'no_inv_bhn'    => $m_no_inv,
 				'tgl_inv_bhn'   => $this->input->post('tgl_inv'),
 				'id_hub'        => $this->input->post('hub_bhn'), 
 				'suplier'       => $this->input->post('supp'), 
+				'plat'       	=> $this->input->post('plat'), 
+				'jenis'       	=> $this->input->post('jenis'), 
+				'pilihan'       => $this->input->post('pilihan'), 
+				'ket'       	=> $this->input->post('ket'), 
 				'qty'           => str_replace('.','',$this->input->post('qty')), 
 				'nominal'       => str_replace('.','',$this->input->post('nom')),
 				'total_bayar'   => str_replace('.','',$this->input->post('total_bayar')),
 				'acc_owner'     => 'N',
+				'add_time' 		=> date('Y-m-d H:i:s'),
 				
 			);
 
@@ -167,14 +179,67 @@ class M_logistik extends CI_Model
 				'tgl_inv_bhn'   => $this->input->post('tgl_inv'),
 				'id_hub'        => $this->input->post('hub_bhn'), 
 				'suplier'       => $this->input->post('supp'), 
+				'plat'       	=> $this->input->post('plat'), 
+				'jenis'       	=> $this->input->post('jenis'), 
+				'pilihan'       => $this->input->post('pilihan'),  
+				'ket'       	=> $this->input->post('ket'), 
 				'qty'           => str_replace('.','',$this->input->post('qty')), 
 				'nominal'       => str_replace('.','',$this->input->post('nom')),
 				'total_bayar'   => str_replace('.','',$this->input->post('total_bayar')),
 				'acc_owner'     => 'N',
+				'edit_time' 	=> date('Y-m-d H:i:s'),
 			);
 
 			$this->db->where('id_inv_bhn', $this->input->post('id_inv_bhn'));
 			$result_header = $this->db->update('invoice_beli_bhn', $data_header);
+			return $result_header;
+		}
+		
+	}
+	
+	function save_inv_masuk()
+	{
+		$status_input = $this->input->post('sts_input');
+		if($status_input == 'add')
+		{
+			$tgl_inv       = $this->input->post('tgl_inv');
+			$tanggal       = explode('-',$tgl_inv);
+			$tahun         = $tanggal[0];
+			$bulan         = $tanggal[1];
+			
+			$c_no_inv    = $this->m_fungsi->urut_transaksi('INV_MASUK_UMUM');
+			$m_no_inv    = $c_no_inv.'/INV/BYR/'.$bulan.'/'.$tahun;
+
+			$data_header = array(
+				'no_inv_masuk'  => $m_no_inv,
+				'tgl_inv_masuk' => $this->input->post('tgl_inv'),
+				'id_hub'        => $this->input->post('hub_masuk'), 
+				'ket'       	=> $this->input->post('ket'), 
+				'nominal'       => str_replace('.','',$this->input->post('nom')),
+				'acc_owner'     => 'N',
+				'add_time' 		=> date('Y-m-d H:i:s'),
+				
+			);
+
+			$result_header = $this->db->insert('invoice_masuk_umum', $data_header);
+
+			return $result_header;
+			
+		}else{
+			
+			$no_inv_masuk    = $this->input->post('no_inv_masuk');
+			$data_header = array(
+				'no_inv_masuk'  => $no_inv_masuk,
+				'tgl_inv_masuk' => $this->input->post('tgl_inv'),
+				'id_hub'        => $this->input->post('hub_masuk'), 
+				'ket'       	=> $this->input->post('ket'), 
+				'nominal'       => str_replace('.','',$this->input->post('nom')),
+				'acc_owner'     => 'N',
+				'edit_time' 	=> date('Y-m-d H:i:s'),
+			);
+
+			$this->db->where('id_inv_masuk', $this->input->post('id_inv_masuk'));
+			$result_header = $this->db->update('invoice_masuk_umum', $data_header);
 			return $result_header;
 		}
 		
