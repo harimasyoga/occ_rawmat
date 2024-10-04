@@ -15,6 +15,15 @@ class Laporan extends CI_Controller
 		$this->load->model('m_fungsi');
 	}
 
+	public function Laporan()
+	{
+		$data = array(
+			'judul' => "Laporan",
+		);
+		$this->load->view('header', $data);
+		$this->load->view('Laporan/v_laporan');
+		$this->load->view('footer');
+	}
 
 	function Laporan_Stok()
 	{
@@ -291,5 +300,246 @@ class Laporan extends CI_Controller
 			$data['prev'] = $html;
 			$this->load->view('view_excel', $data);
 		}
+	}
+
+	function cetak_data()
+	{
+		// $no_stok  = $_GET['no_stok'];
+		 
+		$pilih_type   = $_GET['a'];
+		$tgl_harian   = $_GET['b'];
+		$tgl1_inv     = $_GET['c'];
+		$tgl2_inv     = $_GET['d'];
+		$bulan        = $_GET['e'];
+		$thun         = $_GET['f'];
+		$html         = '';
+
+
+		if($pilih_type=='HARIAN')
+		{
+			$judull    = "HARIAN";
+			$judull2   = $this->m_fungsi->tanggal_format_indonesia($tgl_harian);
+		}else{
+
+		}
+		$html .= '<br>';
+		// $html .= '<h1> Data Kosong </h1>';
+		$html .= '<table width="100%" border="0" cellspacing="1" cellpadding="3" style="border-collapse:collapse;font-size:22px;font-family: Trebuchet MS, Helvetica, sans-serif;">
+		<tr >
+			<td align="center"><b><u>LAPORAN '.$judull.'</u><b></td>
+		</tr> 
+		<tr >
+			<td align="center" style="font-size:15px;"><b>( '.$judull2.' )<b></td>
+		</tr> 
+		</table>';
+
+		
+		$html .= '<br><br>';
+
+		$html .= '<table width="100%" border="0" cellspacing="1" cellpadding="3" style="border-collapse:collapse;font-size:12px;font-family: Trebuchet MS, Helvetica, sans-serif;">
+		<tr >
+			<td><b>SALDO AWAL : <b></td>
+		</tr> 
+		</table>';
+		
+		$html .= '<br>';
+
+		$query_masuk = $this->db->query("SELECT sum(nominal)nominal_masuk from invoice_masuk_umum where tgl_inv_masuk in ('$tgl_harian')")->row();
+
+			
+		$html .= '<table width="100%" border="0" cellspacing="1" cellpadding="3" style="border-collapse:collapse;font-size:12px;font-family: Trebuchet MS, Helvetica, sans-serif;">
+		<tr >
+			<td><b>SALDO MASUK : Rp '.number_format($query_masuk->nominal_masuk, 0, ",", ".").'<b></td>
+		</tr> 
+		</table>';
+		
+		$html .= '<br>';
+
+		$html .= '<table width="100%" border="0" cellspacing="1" cellpadding="3" style="border-collapse:collapse;font-size:12px;font-family: Trebuchet MS, Helvetica, sans-serif;">
+		<tr >
+			<td colspan="2"><b>PEMBELIAN BAHAN BAKU :<b></td>
+			<td colspan="4"><b>&nbsp;<b></td>
+		</tr> 
+		</table>';
+
+		// kardus
+		$html .= '<table width="100%" border="1" cellspacing="1" cellpadding="3" style="border-collapse:collapse;font-size:12px;font-family: Trebuchet MS, Helvetica, sans-serif;">
+		<tr style="background-color: #cccccc;">
+			<th style="" width="5%" align="center">NO</th>
+			<th style="" width="15%" align="center">JENIS</th>
+			<th style="" width="15%" align="center">SUPPLIER</th>
+			<th style="" width="15%" align="center">NO PLAT</th>
+			<th style="" width="15%" align="center">QTY</th>
+			<th style="" width="15%" align="center">HARGA</th>
+			<th style="" width="20%" align="center">TOTAL </th>
+		</tr>';
+
+		if($pilih_type=='HARIAN')
+		{
+			$querydetail = $this->db->query("SELECT*from invoice_beli_bhn 
+			where tgl_inv_bhn ='$tgl_harian' AND jenis in('KARDUS')
+			order by tgl_inv_bhn,pilihan,jenis,suplier");
+
+			$no = 1;
+			$tot_qty = $tot_value = $tot_total = 0;
+			foreach ($querydetail->result() as $r) {
+
+                $total = $r->nominal*$r->qty;
+				$html .= '
+				<tr >
+					<td align="center">' . $no . '</td>
+					<td align="left">' . $r->jenis . '</td>
+					<td align="left">' . $r->suplier . '</td>
+					<td align="center">' . $r->plat . '</td>
+					<td align="right">' . number_format($r->qty, 0, ",", ".") . '</td>
+					<td align="right">' . number_format($r->nominal, 0, ",", ".") . '</td>
+					<td align="right">' . number_format($total, 0, ",", ".") . '</td>
+					</tr>';
+
+				$no++;
+				$tot_qty += $r->qty;
+				$tot_total += $total;
+			}
+			$html .= '
+				<tr style="background-color: #cccccc;">
+					<th style="" colspan="4" align="center">TOTAL BOX</th>
+					<th style="" width="15%" align="right">'.number_format($tot_qty, 0, ",", ".").'</th>
+					<th style="" width="20%" align="center">&nbsp;</th>
+					<th style="" width="20%" align="right">'.number_format($tot_total, 0, ",", ".").' </th>
+				</tr>';
+			$html .= '</table>';
+		}
+		
+		$html .= '<br>';
+
+		// duplex
+		$html .= '<table width="100%" border="1" cellspacing="1" cellpadding="3" style="border-collapse:collapse;font-size:12px;font-family: Trebuchet MS, Helvetica, sans-serif;">
+		<tr style="background-color: #cccccc;">
+			<th style="" width="5%" align="center">NO</th>
+			<th style="" width="15%" align="center">JENIS</th>
+			<th style="" width="15%" align="center">SUPPLIER</th>
+			<th style="" width="15%" align="center">NO PLAT</th>
+			<th style="" width="15%" align="center">QTY</th>
+			<th style="" width="15%" align="center">HARGA</th>
+			<th style="" width="20%" align="center">TOTAL </th>
+		</tr>';
+
+		if($pilih_type=='HARIAN')
+		{
+			$querydetail = $this->db->query("SELECT*from invoice_beli_bhn 
+			where tgl_inv_bhn ='$tgl_harian' AND jenis in('DUPLEX')
+			order by tgl_inv_bhn,pilihan,jenis");
+
+			$no = 1;
+			$tot_qty = $tot_value = $tot_total = 0;
+			
+			if($querydetail->num_rows()>0)
+			{			
+
+				foreach ($querydetail->result() as $r) {
+
+					$total = $r->nominal*$r->qty;
+					$html .= '
+					<tr >
+						<td align="center">' . $no . '</td>
+						<td align="left">' . $r->jenis . '</td>
+						<td align="left">' . $r->suplier . '</td>
+						<td align="center">' . $r->plat . '</td>
+						<td align="right">' . number_format($r->qty, 0, ",", ".") . '</td>
+						<td align="right">' . number_format($r->nominal, 0, ",", ".") . '</td>
+						<td align="right">' . number_format($total, 0, ",", ".") . '</td>
+						</tr>';
+
+					$no++;
+					$tot_qty += $r->qty;
+					$tot_total += $total;
+				}
+
+			}else{
+
+
+				$html .= '
+					<tr><td colspan="7">Data Kosong..</td>';
+
+			}
+			$html .= '
+				<tr style="background-color: #cccccc;">
+					<th style="" colspan="4" align="center">TOTAL DUPLEX</th>
+					<th style="" width="15%" align="right">'.number_format($tot_qty, 0, ",", ".").'</th>
+					<th style="" width="20%" align="center">&nbsp;</th>
+					<th style="" width="20%" align="right">'.number_format($tot_total, 0, ",", ".").' </th>
+				</tr>';
+
+			$html .= '</table>';
+		}
+
+		$html .= '<br>';
+		// $html .= '<h1> Data Kosong </h1>';
+
+
+		$html .= '<table width="100%" border="0" cellspacing="1" cellpadding="3" style="border-collapse:collapse;font-size:12px;font-family: Trebuchet MS, Helvetica, sans-serif;">
+		<tr >
+			<td colspan="2"><b>PEMBELIAN UMUM :<b></td>
+			<td colspan="4"><b>&nbsp;<b></td>
+		</tr> 
+		</table>';
+
+		// umum
+		$html .= '<table width="100%" border="1" cellspacing="1" cellpadding="3" style="border-collapse:collapse;font-size:12px;font-family: Trebuchet MS, Helvetica, sans-serif;">
+		<tr style="background-color: #cccccc;">
+			<th style="" width="5%" align="center">NO</th>
+			<th style="" width="15%" align="center">JENIS</th>
+			<th style="" width="15%" align="center">QTY</th>
+			<th style="" width="15%" align="center">HARGA</th>
+			<th style="" width="20%" align="center">TOTAL </th>
+		</tr>';
+
+		if($pilih_type=='HARIAN')
+		{
+			$querydetail = $this->db->query("SELECT*from invoice_beli_bhn 
+			where tgl_inv_bhn ='$tgl_harian' AND pilihan in('UMUM')
+			order by tgl_inv_bhn,pilihan,jenis");
+
+			$no = 1;
+			$tot_qty = $tot_value = $tot_total = 0;
+			foreach ($querydetail->result() as $r) {
+
+                $total = $r->nominal*$r->qty;
+				$html .= '
+				<tr >
+					<td align="center">' . $no . '</td>
+					<td align="left">' . $r->jenis . '</td>
+					<td align="right">' . number_format($r->qty, 0, ",", ".") . '</td>
+					<td align="right">' . number_format($r->nominal, 0, ",", ".") . '</td>
+					<td align="right">' . number_format($total, 0, ",", ".") . '</td>
+					</tr>';
+
+				$no++;
+				$tot_qty += $r->qty;
+				$tot_total += $total;
+			}
+			$html .= '
+				<tr style="background-color: #cccccc;">
+					<th style="" colspan="2" align="center">TOTAL LAIN-LAIN</th>
+					<th style="" width="15%" align="right">'.number_format($tot_qty, 0, ",", ".").'</th>
+					<th style="" width="20%" align="center">&nbsp;</th>
+					<th style="" width="20%" align="right">'.number_format($tot_total, 0, ",", ".").' </th>
+				</tr>';
+			$html .= '</table>';
+		}
+		
+		$html .= '<br>';
+		
+
+
+		$data['prev']   = $html;
+		$judul          = $pilih_type;
+		$jdl_save       = $pilih_type;
+		$position       = 'P';
+		$cekpdf         = '1';
+
+		// echo $html;
+		$this->m_fungsi->_mpdf_hari($position, 'A4', $judul, $html, $jdl_save.'.pdf', 5, 5, 5, 10,'','','',$data->nm_hub);
+			
 	}
 }
