@@ -421,7 +421,7 @@ class Logistik extends CI_Controller
 				$btnHapus = '<button type="button" title="DELETE"  onclick="deleteData(' . $id . ',' . $no_inv_bhn . ')" class="btn btn-secondary btn-sm">
 				<i class="fa fa-trash-alt"></i></button> ';
 					
-				if (in_array($this->session->userdata('level'), ['Admin','User']))
+				if (in_array($this->session->userdata('level'), ['Admin','User','Invoice']))
 				{
 					$row[] = '<div class="text-center">'.$btnEdit.' '.$btncetak.''.$btnHapus.'</div>';
 
