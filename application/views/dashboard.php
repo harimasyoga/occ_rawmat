@@ -12,7 +12,7 @@
       </div><!-- /.container-fluid -->
     </section>
 
-    <?php if(in_array($level, ['Admin','User','Owner','Keuangan1'])){ ?>
+    <?php if(in_array($level, ['Admin','User','Owner','Keuangan1','Invoice'])){ ?>
     <!-- REKAP INVOICE BAHAN -->
     <!-- content2 -->
 
