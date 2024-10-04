@@ -23,7 +23,7 @@
           <div class="col-md-12">
             <div class="row">
 
-                  <?php if(in_array($level, ['Admin','User','Owner','Hub'])){ ?>
+                  <?php if(in_array($level, ['Admin','User','Owner','Hub','Invoice'])){ ?>
                     
                     <div class="col-md-12 row-jatuh_tempo">
                       <div class="card card-info card-outline">
@@ -240,7 +240,7 @@
   <script type="text/javascript">
     $(document).ready(function() {
       $(".select2").select2()
-      <?php if(in_array($level, ['Admin','User','Owner','Hub'])){ ?>        
+      <?php if(in_array($level, ['Admin','User','Owner','Hub','Invoice'])){ ?>        
         load_inv_bahan()
         load_timb_bahan()
       <?php } ?>
@@ -249,7 +249,7 @@
 
     function reloadTable() 
     {
-      <?php if(in_array($level, ['Admin','User','Owner','Hub'])){ ?>
+      <?php if(in_array($level, ['Admin','User','Owner','Hub','Invoice'])){ ?>
         load_inv_bahan()  
         load_timb_bahan()
       <?php } ?>
