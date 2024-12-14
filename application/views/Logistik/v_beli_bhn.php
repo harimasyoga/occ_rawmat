@@ -92,6 +92,7 @@
 							<select id="jenis" name="jenis" class="form-control select2" style="width: 100%" >
 								<option value="KARDUS">KARDUS</option>
 								<option value="DUPLEX">DUPLEX</option>
+								<option value="PLUMPUNG">DUPLEX</option>
 							</select>
 						</div>
 						<div class="col-md-1"></div>
