@@ -22,7 +22,7 @@ class Master extends CI_Controller
 		);
 		$this->load->view('header',$data );
 
-		if (in_array($this->session->userdata('level'), ['Admin' ,'Owner','Invoice']))
+		if (in_array($this->session->userdata('level'), ['Admin' ,'Owner','Invoice','User']))
 		{			
 			$this->load->view('dashboard');
 		}else{
