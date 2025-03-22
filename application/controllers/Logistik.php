@@ -1260,7 +1260,7 @@ class Logistik extends CI_Controller
 			$bln_thn   = explode('-',$rentang_bulan);
 			$tahun     = $bln_thn[0];
 			$blnn      = $bln_thn[1];
-			$where     = "WHERE MONTH(tgl_inv_masuk) in ('$blnn') and YEAR(tgl_inv_masuk) in ('$tahun')";
+			$where     = "and MONTH(tgl_inv_masuk) in ('$blnn') and YEAR(tgl_inv_masuk) in ('$tahun')";
 			$rentang_bulan_1  = $this->m_fungsi->getBulan($rentang_bulan);
 		}else{
 			$tahun             = date('Y');
