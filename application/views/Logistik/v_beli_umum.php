@@ -34,6 +34,7 @@
 					<?php if(in_array($this->session->userdata('level'), ['Admin','User'])){ ?>
 						<div style="margin-bottom:12px">
 							<button type="button" class="btn btn-sm btn-info" onclick="add_data()"><i class="fa fa-plus"></i> <b>TAMBAH DATA</b></button>
+							<button type="button" class="btn btn-sm btn-danger" onclick="pilih_bulan()"><i class="fa fa-print"></i> <b>REKAP DATA</b></button>
 						</div>
 					<?php } ?>
 					<div style="overflow:auto;">
@@ -180,6 +181,41 @@
 </div>
 
 
+<!-- modal PILIH BULAN -->
+<div class="modal fade" id="pilih_bulan">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h4 class="modal-title" id="">Pilih Bulan</h4>
+			</div>
+			<div class="modal-body">
+				<div class="card-body row" style="padding-bottom:1px;font-weight:bold;" id="blnn" >						
+					<div class="col-md-2">BULAN</div>
+						<div class="col-md-3">
+
+							<input type="month" class="form-control " name="rentang_bulan" id="rentang_bulan">
+						</div>
+					<div class="col-md-6"></div>
+					
+				</div>
+			</div>
+			<div class="modal-footer justify-content-between">
+				<div class="card-body row" style="padding-bottom:1px;font-weight:bold;" id="blnn" >						
+					<div class="col-md-2">
+						<button type="button" class="btn btn-sm btn-primary" onclick="cetak(0)"><i class="fa fa-print"></i> <b>LAYAR</b></button>
+					</div>
+					<div class="col-md-6">				
+						<button type="button" class="btn btn-sm btn-danger" onclick="cetak(1)"><i class="fa fa-print"></i> <b>PDF</b></button>
+					</div>
+					
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- end modal PILIH BULAN -->
+
+
 <script type="text/javascript">
 
 	const urlAuth = '<?= $this->session->userdata('level')?>';
@@ -194,6 +230,19 @@
 	});
 	
 	var rowNum = 0;
+
+	
+	function pilih_bulan() 
+	{		
+		$("#pilih_bulan").modal("show");
+	}
+	
+	function cetak(ctk) 
+	{
+		rentang_bulan = $('#rentang_bulan').val();
+		var url = "<?= base_url('Logistik/cetak_keluar_umum'); ?>";
+		window.open(url + '?rentang_bulan=' + rentang_bulan+'&ctk='+ctk, '_blank');
+	}
 
 	function load_hub() 
 	{
