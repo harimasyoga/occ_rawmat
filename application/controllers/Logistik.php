@@ -1148,6 +1148,322 @@ class Logistik extends CI_Controller
 		}
 	}
 
+	function cetak_masuk()
+	{
+		$rentang_bulan    = $_GET['rentang_bulan'];
+		$ctk              = $_GET['ctk'];
+
+		if($rentang_bulan)
+		{
+			$bln_thn   = explode('-',$rentang_bulan);
+			$tahun     = $bln_thn[0];
+			$blnn      = $bln_thn[1];
+			$where     = "WHERE MONTH(tgl_inv_masuk) in ('$blnn') and YEAR(tgl_inv_masuk) in ('$tahun')";
+			$rentang_bulan_1  = $this->m_fungsi->getBulan($rentang_bulan);
+		}else{
+			$tahun             = date('Y');
+			$blnn              = date('m');
+			$where             = "";
+			$rentang_bulan_1   = "SEMUA";
+		}
+
+		
+
+        $query_header = $this->db->query("SELECT* from invoice_masuk_umum a
+			JOIN m_hub b on a.id_hub=b.id_hub
+			$where
+			order by tgl_inv_masuk desc, id_inv_masuk ");
+        
+        $data = $query_header->row();
+        
+        $query = $this->db->query("SELECT* from invoice_masuk_umum a
+			JOIN m_hub b on a.id_hub=b.id_hub
+			$where
+			order by tgl_inv_masuk desc, id_inv_masuk  ");
+
+		$html = '';
+		$html .= '<table style="border-collapse:collapse;font-family: Tahoma; font-size:11px" width="100%" align="center" border="0" cellspacing="1" cellpadding="3">
+				  <tr>
+					   <td colspan="20" width="15%" style="text-align:center; font-size:20px;"><b>REKAP PEMASUKAN UMUM</b></td>
+				  </tr>
+			 </table>';
+		$html .= '
+		<table style="margin-bottom:16px;font-size:12px;border-collapse:collapse" border="0" width="100%">
+			<tr>
+				<td width="10%">Bulan</td>
+				<td width="5%">:</td>
+				<td width="15%">'.$rentang_bulan_1.'</td>
+				<td width="70%"></td>
+			</tr>
+		</table> ';
+
+
+		if ($query->num_rows() > 0) {
+
+			$html .= '<table width="100%" border="1" cellspacing="1" cellpadding="3" style="border-collapse:collapse;font-size:12px;font-family: ;">
+                        <tr style="background-color: #cccccc">
+                            <th style="background-color: #cccccc" width="10%" align="center">No</th>
+                            <th style="background-color: #cccccc" width="10%" align="center">No Invoice</th>
+                            <th style="background-color: #cccccc" width="10%" align="center">Tgl Invoice</th>
+                            <th style="background-color: #cccccc" width="10%" align="center">Nominal</th>
+                            <th style="background-color: #cccccc" width="10%" align="center">Hub</th>
+							</tr>
+							
+							';
+			$no        = 1;
+			$bb        = 0;
+			foreach ($query->result() as $r) {
+				$html .= '
+					<tr >
+						<td align="center">' . $no . '</td>
+						<td align="left">' . $r->no_inv_masuk . '</td>
+						<td align="center">' . $r->tgl_inv_masuk . '</td>
+						<td align="center">' . $r->nominal . '</td>
+						<td align="center">' . $r->nm_hub . '</td>
+						';
+				$html .= '</tr>';
+				$no++;
+			}
+			$html .= '
+                 </table>';
+		} else {
+			$html .= '<h1> Data Kosong </h1>';
+		}
+
+		
+		switch ($ctk) {
+			case 0;
+				echo ("<title>DATA PEMASUKAN UMUM</title>");
+				echo ($html);
+			break;
+
+			case 1;				
+				$this->m_fungsi->_mpdf_hari('L', 'A4', '-', $html, 'DATA PEMASUKAN UMUM.pdf', 5, 5, 5, 10);
+			break;
+
+			case 2;
+				header("Cache-Control: no-cache, no-store, must-revalidate");
+				header("Content-Type: application/vnd-ms-excel");
+				header("Content-Disposition: attachment; filename= $judul.xls");
+				$this->load->view('app/master_cetak', $data);
+			break;
+		}
+	}
+	
+	function cetak_keluar_umum()
+	{
+		$rentang_bulan    = $_GET['rentang_bulan'];
+		$ctk              = $_GET['ctk'];
+
+		if($rentang_bulan)
+		{
+			$bln_thn   = explode('-',$rentang_bulan);
+			$tahun     = $bln_thn[0];
+			$blnn      = $bln_thn[1];
+			$where     = "WHERE MONTH(tgl_inv_masuk) in ('$blnn') and YEAR(tgl_inv_masuk) in ('$tahun')";
+			$rentang_bulan_1  = $this->m_fungsi->getBulan($rentang_bulan);
+		}else{
+			$tahun             = date('Y');
+			$blnn              = date('m');
+			$where             = "";
+			$rentang_bulan_1   = "SEMUA";
+		}
+
+		
+
+        $query_header = $this->db->query("SELECT* from invoice_beli_bhn a
+			JOIN m_hub b on a.id_hub=b.id_hub WHERE pilihan ='UMUM'
+			$where
+			order by tgl_inv_bhn desc,jenis, id_inv_bhn");
+        
+        $data = $query_header->row();
+        
+        $query = $this->db->query("SELECT* from invoice_beli_bhn a
+			JOIN m_hub b on a.id_hub=b.id_hub WHERE pilihan ='UMUM'
+			$where
+			order by tgl_inv_bhn desc,jenis, id_inv_bhn ");
+
+		$html = '';
+		$html .= '<table style="border-collapse:collapse;font-family: Tahoma; font-size:11px" width="100%" align="center" border="0" cellspacing="1" cellpadding="3">
+				  <tr>
+					   <td colspan="20" width="15%" style="text-align:center; font-size:20px;"><b>REKAP PENGELUARAN UMUM</b></td>
+				  </tr>
+			 </table>';
+		$html .= '
+		<table style="margin-bottom:16px;font-size:12px;border-collapse:collapse" border="0" width="100%">
+			<tr>
+				<td width="10%">Bulan</td>
+				<td width="5%">:</td>
+				<td width="15%">'.$rentang_bulan_1.'</td>
+				<td width="70%"></td>
+			</tr>
+		</table> ';
+
+
+		if ($query->num_rows() > 0) {
+
+
+			$html .= '<table width="100%" border="1" cellspacing="1" cellpadding="3" style="border-collapse:collapse;font-size:12px;font-family: ;">
+                        <tr style="background-color: #cccccc">
+                            <th style="background-color: #cccccc" width="5%" align="center">No</th>
+                            <th style="background-color: #cccccc" width="15%" align="center">No Inv</th>
+                            <th style="background-color: #cccccc" width="10%" align="center">Tanggal</th>
+                            <th style="background-color: #cccccc" width="20%" align="center">Jenis</th>
+                            <th style="background-color: #cccccc" width="15%" align="center">Nama Hub</th>
+                            <th style="background-color: #cccccc" width="10%" align="center">Ket</th>
+                            <th style="background-color: #cccccc" width="5%" align="center">Qty</th>
+                            <th style="background-color: #cccccc" width="10%" align="center">Nominal</th>
+                            <th style="background-color: #cccccc" width="10%" align="center">Total Bayar</th>
+							</tr>
+							';
+			$no        = 1;
+			$bb        = 0;
+			foreach ($query->result() as $r) {
+				$html .= '
+					<tr >
+						<td align="center">' . $no . '</td>
+						<td align="left">' . $r->no_inv_bhn . '</td>
+						<td align="left">' . $r->tgl_inv_bhn . '</td>
+						<td align="left">' . $r->jenis . '</td>
+						<td align="center">' . $r->nm_hub . '</td>
+						<td align="left">' . $r->ket . '</td>
+						<td align="right">' . $r->qty. '</td>
+						<td align="right">' . $r->nominal. '</td>
+						<td align="right">' . $r->total_bayar. '</td>
+						';
+				$html .= '</tr>';
+				$no++;
+			}
+			$html .= '
+                 </table>';
+		} else {
+			$html .= '<h1> Data Kosong </h1>';
+		}
+
+
+		switch ($ctk) {
+			case 0;
+				echo ("<title>DATA PENGELUARAN UMUM</title>");
+				echo ($html);
+				break;
+
+			case 1;
+				$this->m_fungsi->_mpdf_hari('L', 'A4', 'DATA PENGELUARAN UMUM', $html, 'DATA_PENGELUARAN_UMUM.pdf', 5, 5, 5, 10);
+			case 2;
+				header("Cache-Control: no-cache, no-store, must-revalidate");
+				header("Content-Type: application/vnd-ms-excel");
+				header("Content-Disposition: attachment; filename= $judul.xls");
+				$this->load->view('app/master_cetak', $data);
+				break;
+		}
+	}
+	
+	function cetak_keluar_bahan()
+	{
+		$rentang_bulan    = $_GET['rentang_bulan'];
+		$ctk              = $_GET['ctk'];
+
+		if($rentang_bulan)
+		{
+			$bln_thn   = explode('-',$rentang_bulan);
+			$tahun     = $bln_thn[0];
+			$blnn      = $bln_thn[1];
+			$where     = "and MONTH(tgl_inv_bhn) in ('$blnn') and YEAR(tgl_inv_bhn) in ('$tahun')";
+			$rentang_bulan_1  = $this->m_fungsi->getBulan($rentang_bulan);
+		}else{
+			$tahun             = date('Y');
+			$blnn              = date('m');
+			$where             = "";
+			$rentang_bulan_1   = "SEMUA";
+		}
+		
+        $query_header = $this->db->query("SELECT* from invoice_beli_bhn a
+			JOIN m_hub b on a.id_hub=b.id_hub 
+			WHERE pilihan ='BAHAN' $where
+			order by tgl_inv_bhn desc, id_inv_bhn");
+        
+        $data = $query_header->row();
+        
+        $query = $this->db->query("SELECT* from invoice_beli_bhn a
+			JOIN m_hub b on a.id_hub=b.id_hub 
+			WHERE pilihan ='BAHAN' $where
+			order by tgl_inv_bhn desc, id_inv_bhn ");
+
+		$html = '';
+		$html .= '<table style="border-collapse:collapse;font-family: Tahoma; font-size:11px" width="100%" align="center" border="0" cellspacing="1" cellpadding="3">
+				  <tr>
+					   <td colspan="20" width="15%" style="text-align:center; font-size:20px;"><b>REKAP PENGELUARAN BAHAN</b></td>
+				  </tr>
+			 </table>';
+		$html .= '
+		<table style="margin-bottom:16px;font-size:12px;border-collapse:collapse" border="0" width="100%">
+			<tr>
+				<td width="10%">Bulan</td>
+				<td width="5%">:</td>
+				<td width="15%">'.$rentang_bulan_1.'</td>
+				<td width="70%"></td>
+			</tr>
+		</table> ';
+
+
+		if ($query->num_rows() > 0) {
+
+
+			$html .= '<table width="100%" border="1" cellspacing="1" cellpadding="3" style="border-collapse:collapse;font-size:12px;font-family: ;">
+                        <tr style="background-color: #cccccc">
+                            <th style="background-color: #cccccc" width="5%" align="center">No</th>
+                            <th style="background-color: #cccccc" width="15%" align="center">No Inv</th>
+                            <th style="background-color: #cccccc" width="10%" align="center">Tanggal</th>
+                            <th style="background-color: #cccccc" width="20%" align="center">Jenis</th>
+                            <th style="background-color: #cccccc" width="15%" align="center">Nama Hub</th>
+                            <th style="background-color: #cccccc" width="10%" align="center">Ket</th>
+                            <th style="background-color: #cccccc" width="5%" align="center">Qty</th>
+                            <th style="background-color: #cccccc" width="10%" align="center">Nominal</th>
+                            <th style="background-color: #cccccc" width="10%" align="center">Total Bayar</th>
+							</tr>
+							';
+			$no        = 1;
+			$bb        = 0;
+			foreach ($query->result() as $r) {
+				$html .= '
+					<tr >
+						<td align="center">' . $no . '</td>
+						<td align="left">' . $r->no_inv_bhn . '</td>
+						<td align="left">' . $r->tgl_inv_bhn . '</td>
+						<td align="left">' . $r->jenis . '</td>
+						<td align="center">' . $r->nm_hub . '</td>
+						<td align="left">' . $r->ket . '</td>
+						<td align="right">' . $r->qty. '</td>
+						<td align="right">' . $r->nominal. '</td>
+						<td align="right">' . $r->total_bayar. '</td>
+						';
+				$html .= '</tr>';
+				$no++;
+			}
+			$html .= '
+                 </table>';
+		} else {
+			$html .= '<h1> Data Kosong </h1>';
+		}
+
+
+		switch ($ctk) {
+			case 0;
+				echo ("<title>DATA PENGELUARAN UMUM</title>");
+				echo ($html);
+				break;
+
+			case 1;
+				$this->m_fungsi->_mpdf_hari('L', 'A4', 'DATA PENGELUARAN UMUM', $html, 'DATA_PENGELUARAN_UMUM.pdf', 5, 5, 5, 10);
+			case 2;
+				header("Cache-Control: no-cache, no-store, must-revalidate");
+				header("Content-Type: application/vnd-ms-excel");
+				header("Content-Disposition: attachment; filename= $judul.xls");
+				$this->load->view('app/master_cetak', $data);
+				break;
+		}
+	}
+	
 	function cetak_nota()
 	{
 		$no_inv_bhn        = $_GET['no_inv_bhn'];
