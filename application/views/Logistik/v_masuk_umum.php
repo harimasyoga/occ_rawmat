@@ -564,7 +564,7 @@
 				url: '<?= base_url(); ?>Logistik/hapus',
 				data: ({
 					id         : no_inv_masuk,
-					jenis      : 'invoice_beli_masuk',
+					jenis      : 'invoice_masuk_umum',
 					field      : 'no_inv_masuk'
 				}),
 				type: "POST",
